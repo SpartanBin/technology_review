@@ -1,0 +1,26 @@
+# 论文阅读
+
+- Attention Is All You Need
+- BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+- An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale
+- Masked Autoencoders Are Scalable Vision Learners
+- Momentum Contrast for Unsupervised Visual Representation Learning
+- Swin Transformer: Hierarchical Vision Transformer using Shifted Windows
+- Learning Transferable Visual Models From Natural Language Supervision
+- Evaluating Large Language Models Trained on Code
+- Competition-Level Code Generation with AlphaCode
+- GPT 1 2 3
+- Training language models to follow instructions with human feedback
+- Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback
+- The Llama 3 Herd of Models
+- Robust Speech Recognition via Large-Scale Weak Supervision
+- DALL-E 1 2 3
+- AlphaFold 1 2 3
+- ViLT: Vision-and-Language Transformer Without Convolution or Region Supervision
+- Align before Fuse: Vision and Language Representation Learning with Momentum Distillation
+- VLMo: Unified Vision-Language Pre-Training with Mixture-of-Modality-Experts
+- BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation
+- CoCa: Contrastive Captioners are Image-Text Foundation Models
+- Image as a Foreign Language: BEiT Pretraining for All Vision and Vision-Language Tasks
+- Movie Gen: A Cast of Media Foundation Models
+- HunyuanVideo: A Systematic Framework For Large Video Generative Models
