@@ -30,7 +30,9 @@
 ## <span id="202502021731"> Attention Is All You Need </span>
 - Google Brain, Google Research, 2017.6
 
-![transformer_entirety](/img/transformer_entirety.png)
+<p align = "center">
+<img src=/img/transformer_entirety.png width="400" />
+</p>
 
 - 多头注意力实现 (pytorch)，参考的[MAPPO, 2021](https://github.com/marlbenchmark/on-policy/blob/main/onpolicy/algorithms/mat/algorithm/ma_transformer.py)
 
