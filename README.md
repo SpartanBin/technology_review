@@ -86,12 +86,14 @@ class MultiHeadAttention(nn.Module):
 - 如果堆叠多层decoder，每一层的k、v的原tensor都是同一个tensor，就是encoder的输出
 - 激活函数使用的ReLU
 - Positional Encoding实现，GPT生成
-$$
-PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right)
-$$
-$$
-PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right)
-$$
+
+<div align="center">
+
+$$ PE(pos, 2i) = \sin\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right) $$
+$$ PE(pos, 2i+1) = \cos\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right) $$
+
+</div>
+
 ```python
 import numpy as np
 
