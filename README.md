@@ -169,6 +169,20 @@ def positional_encoding(seq_length, d_model):
 - (GPT 1) Improving Language Understanding by Generative Pre-Training
 - (GPT 2) Language Models are Unsupervised Multitask Learners
 - (GPT 3) Language Models are Few-Shot Learners
+- GPT 1号称使用[multi-layer Transformer decoder](https://arxiv.org/abs/1801.10198)的结构，实际没有，以下才是它的结构
+
+<p align = "center">
+<img src=/img/gpt1_entirety.png width="300" />
+</p>
+
+- 所以和原transformer decoder相比，GPT 1的每个block少了一个接收来自encoder K、V的multi-head attention
+- GPT 1使用可学习的position embedding
+- 下游任务都是使用最后一个token的embedding进入不同的输出头
+- 基本所有的类GPT 1自回归生成LM每次都只预测一个token
+- 所有的类GPT 1自回归生成LM都是在推理(inference)时递归地生成内容，即在每一步预测时，模型输入的是之前所有生成的 token（加上可能的初始上下文），从而不断扩展文本，也就是说，推理时模型需要考虑所有过去生成的内容。但是在训练期间都使用teacher forcing，即使用真实的、已知的token序列作为输入
+- 所以为了节省资源，类GPT 1自回归生成LM可以缓存先前的K、V cache，每次只计算新的一个token的Q、K、V，并继续储存K、V
+
+
 
 ## <span id="202502021741"> Training language models to follow instructions with human feedback </span>
 - OpenAI, 2022.3
