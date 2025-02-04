@@ -80,8 +80,6 @@ class MultiHeadAttention(nn.Module):
         # causal attention: (B, nh, L, hs) x (B, nh, hs, L) -> (B, nh, L, L)
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
 
-        # self.att_bp = F.softmax(att, dim=-1)
-
         if self.masked:
             att = att.masked_fill(self.mask == 0, float('-inf'))
         att = F.softmax(att, dim=-1)
@@ -96,7 +94,7 @@ class MultiHeadAttention(nn.Module):
 ```
 - k、q、v都是同一个tensor经过linear transformation得到的（至少对于encoder是这样），对于decoder来说k、v的原tensor来自encoder的输出
 - 如果堆叠多层decoder，每一层的k、v的原tensor都是同一个tensor，就是encoder的输出
-- 激活函数使用的ReLU
+- Feed Forward只作用于最后一个维度(d_model)，就是一个两层FCN，宽度通常大于d_model，先把d_model拉大，再还原到d_model大小，激活函数使用的ReLU
 - residual是先加后接LayerNorm
 - Positional Encoding实现，GPT生成
 
