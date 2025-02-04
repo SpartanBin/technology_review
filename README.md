@@ -29,6 +29,92 @@
 
 ## <span id="202502021731"> Attention Is All You Need </span>
 - Google Brain, Google Research, 2017.6
+- 多头注意力实现 (pytorch)，参考的[MAPPO, 2021](https://github.com/marlbenchmark/on-policy/blob/main/onpolicy/algorithms/mat/algorithm/ma_transformer.py)
+```python
+import math
+
+import torch
+import torch.nn as nn
+from torch.nn import functional as F
+
+
+class MultiHeadAttention(nn.Module):
+
+    def __init__(self, d_model, n_head, L, masked=False):
+
+        super().__init__()
+
+        assert d_model % n_head == 0
+        self.masked = masked
+        self.n_head = n_head
+        # key, query, value projections for all heads
+        self.key = nn.Linear(d_model, d_model)
+        self.query = nn.Linear(d_model, d_model)
+        self.value = nn.Linear(d_model, d_model)
+        # output projection
+        self.proj = nn.Linear(d_model, d_model)
+        # causal mask to ensure that attention is only applied to the left in the input sequence
+        self.mask = torch.tril(torch.ones(L, L)).view(1, 1, L, L)
+
+    def forward(self, key, value, query):
+
+        B, L, D = query.size()
+
+        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        k = self.key(key).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
+        q = self.query(query).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
+        v = self.value(value).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
+
+        # causal attention: (B, nh, L, hs) x (B, nh, hs, L) -> (B, nh, L, L)
+        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
+
+        # self.att_bp = F.softmax(att, dim=-1)
+
+        if self.masked:
+            att = att.masked_fill(self.mask == 0, float('-inf'))
+        att = F.softmax(att, dim=-1)
+
+        y = att @ v  # (B, nh, L, L) x (B, nh, L, hs) -> (B, nh, L, hs)
+        y = y.transpose(1, 2).contiguous().view(B, L, D)  # re-assemble all head outputs side by side
+
+        # output projection
+        y = self.proj(y)
+
+        return y
+```
+- k、q、v都是同一个tensor经过linear transformation得到的（至少对于encoder是这样），对于decoder来说k、v的原tensor来自encoder的输出
+- 如果堆叠多层decoder，每一层的k、v的原tensor都是同一个tensor，就是encoder的输出
+- 激活函数使用的ReLU
+- Positional Encoding实现，GPT生成
+$$
+PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right)
+$$
+$$
+PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{\frac{2i}{d_{\text{model}}}}}\right)
+$$
+```python
+import numpy as np
+
+def positional_encoding(seq_length, d_model):
+    """
+    生成 Positional Encoding 矩阵。
+    
+    :param seq_length: 序列长度
+    :param d_model: 词嵌入维度
+    :return: 形状为 (seq_length, d_model) 的位置编码矩阵
+    """
+    position = np.arange(seq_length)[:, np.newaxis]  # (seq_length, 1)
+    div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))  # shape = (d_model / 2,)
+    
+    pe = np.zeros((seq_length, d_model))
+    pe[:, 0::2] = np.sin(position * div_term)  # 偶数维度使用 sin
+    pe[:, 1::2] = np.cos(position * div_term)  # 奇数维度使用 cos
+    
+    return pe
+```
+- 这个位置编码与原tensor相加就应用了该位置编码
+- div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))是在计算 10000^(2i/d_model) 的倒数，即 1 / (10000^(2i/d_model))，控制不同维度的位置编码缩放
+- 未解决的疑问：transformer原本是被设计出来解决翻译问题的，翻译问题的encoder输入肯定是被翻译语言，decoder的输入是什么？还有就是encoder的输入的L和decoder的L不一样长怎么办，是否要求一样长？
 
 ## <span id="202502021732"> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding </span>
 - Google AI Language, 2018.10
