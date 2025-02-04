@@ -29,7 +29,17 @@
 
 ## <span id="202502021731"> Attention Is All You Need </span>
 - Google Brain, Google Research, 2017.6
+
+![transformer_entirety](/img/transformer_entirety.png)
+
 - 多头注意力实现 (pytorch)，参考的[MAPPO, 2021](https://github.com/marlbenchmark/on-policy/blob/main/onpolicy/algorithms/mat/algorithm/ma_transformer.py)
+
+<div align="center">
+
+$$ \text{Attention}(Q, K, V) = \text{softmax} \left( \frac{QK^T}{\sqrt{d_k}} \right) V $$
+
+</div>
+
 ```python
 import math
 
@@ -85,6 +95,7 @@ class MultiHeadAttention(nn.Module):
 - k、q、v都是同一个tensor经过linear transformation得到的（至少对于encoder是这样），对于decoder来说k、v的原tensor来自encoder的输出
 - 如果堆叠多层decoder，每一层的k、v的原tensor都是同一个tensor，就是encoder的输出
 - 激活函数使用的ReLU
+- residual是先加后接LayerNorm
 - Positional Encoding实现，GPT生成
 
 <div align="center">
