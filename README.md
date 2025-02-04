@@ -14,6 +14,7 @@
 - [Claude (Anthropic, 2022.4)](#202502021742)
 - [Llama 3 (Meta, 2024.7)](#202502021743)
 - [Mistral AI](#202502022356)
+- [MoE (Google Brain, 2017.1)](#202502050303)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
 - [DALL-E 1 2 3 (OpenAI)](#202502021745)
@@ -199,6 +200,9 @@ def positional_encoding(seq_length, d_model):
 - Mistral AI
 - 是原Llama 1团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
 - 听说Mistral Large 2比Llama3.1擅长代码和数学
+
+## <span id="202502050303"> Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer </span>
+- Google Brain, 2017.1
 
 ## <span id="202502021744"> Robust Speech Recognition via Large-Scale Weak Supervision </span>
 - OpenAI, 2022.12
