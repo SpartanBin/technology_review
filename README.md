@@ -34,7 +34,7 @@
 <img src=/img/transformer_entirety.png width="400" />
 </p>
 
-- 多头注意力实现 (pytorch)，参考的[MAPPO, 2021](https://github.com/marlbenchmark/on-policy/blob/main/onpolicy/algorithms/mat/algorithm/ma_transformer.py)
+- 多头注意力实现(pytorch)，参考的[MAPPO, 2021](https://github.com/marlbenchmark/on-policy/blob/main/onpolicy/algorithms/mat/algorithm/ma_transformer.py)
 
 <div align="center">
 
@@ -133,6 +133,17 @@ def positional_encoding(seq_length, d_model):
 
 ## <span id="202502021732"> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding </span>
 - Google AI Language, 2018.10
+
+<p align = "center">
+<img src=/img/bert_pretrain.png width="300" />
+<img src=/img/bert_embedding.png width="500" />
+</p>
+
+- BERT由transformer的encoder堆叠而成，所以是没有使用transformer原文中decoder使用的mask的
+- BERT有三个可学习的embedding，就是word embedding、position embedding和segment embedding，最后将三者相加作为token的最终embedding，注意都是可学习的(比如用nn.Embedding实现)，这和transformer就不一样了
+- word embedding就是语言模型都有的word embedding，position embedding用来表示位置（如transformer中的Positional Encoding），segment embedding基本上bert类模型独有，用来区分不同的句子
+- bert的token中有三种特殊字符，分别是[CLS]、[SEP]和[MASK]，[CLS]的最终embedding用于下游分类任务，[SEP]放在一个句子的结尾（英文一个sequence可以最多由两个句子组成），[MASK]用于表示需要模型预测的词语（也就是预训练任务1拿去算loss的词语）
+- 预训练任务有两种，1上面有提到，2是NSP，就是判断sequence中句子B是不是句子A的下一句，为了下游任务的鲁棒性，任务1模型输入中需要预测的词语有80%会被换成[MASK]，有10%会变成一个随机词语，剩下的直接不替换
 
 ## <span id="202502021733"> An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale </span>
 - Google Research, Brain, 2020.10
