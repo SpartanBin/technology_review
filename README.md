@@ -9,7 +9,7 @@
 - [CLIP (OpenAI, 2021.2)](#202502021737)
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
-- [GPT 1 2 3 (OpenAI)](#202502021740)
+- [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
 - [Claude (Anthropic, 2022.4)](#202502021742)
 - [Llama 3 (Meta, 2024.7)](#202502021743)
@@ -165,7 +165,10 @@ def positional_encoding(seq_length, d_model):
 - DeepMind, 2022.2
 
 ## <span id="202502021740"> GPT 1 2 3 </span>
-- OpenAI
+- OpenAI, 2018.6, 2019.2, 2020.5
+- (GPT 1) Improving Language Understanding by Generative Pre-Training
+- (GPT 2) Language Models are Unsupervised Multitask Learners
+- (GPT 3) Language Models are Few-Shot Learners
 
 ## <span id="202502021741"> Training language models to follow instructions with human feedback </span>
 - OpenAI, 2022.3
