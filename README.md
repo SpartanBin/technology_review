@@ -169,7 +169,7 @@ def positional_encoding(seq_length, d_model):
 ## <span id="202502091904"> Scaling Laws for Neural Language Models </span>
 - OpenAI, 2020.1
 - FLOPs即浮点运算次数，Transformer模型的前向传播中每个参数大约需要2次浮点运算，反向传播大约需要4次，从而每个参数每处理一个token总共约6次FLOPs（训练时），因此，训练过程中总计算量可以近似表示为，C = 6 * N * D，N是模型参数量，D是过模型的token数量
-- 训练(validation loss)损失与模型大小之间基本呈正比关系（线性关系）
+- 训练(validation loss)损失与模型大小的倒数间基本呈正比关系（线性关系）
 
 <div align="center">
 
