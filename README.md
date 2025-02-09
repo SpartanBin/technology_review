@@ -9,6 +9,7 @@
 - [CLIP (OpenAI, 2021.2)](#202502021737)
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
+- [Scaling Laws (OpenAI, 2020.1)](#202502091904)
 - [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
 - [Claude (Anthropic, 2022.4)](#202502021742)
@@ -165,6 +166,17 @@ def positional_encoding(seq_length, d_model):
 ## <span id="202502021739"> Competition-Level Code Generation with AlphaCode </span>
 - DeepMind, 2022.2
 
+## <span id="202502091904"> Scaling Laws for Neural Language Models </span>
+- OpenAI, 2020.1
+- FLOPs即浮点运算次数，Transformer模型的前向传播中每个参数大约需要2次浮点运算，反向传播大约需要4次，从而每个参数每处理一个token总共约6次FLOPs（训练时），因此，训练过程中总计算量可以近似表示为，C = 6 * N * D，N是模型参数量，D是过模型的token数量
+- 训练(validation loss)损失与模型大小之间基本呈正比关系（线性关系）
+
+<div align="center">
+
+$$ L(N) \propto N^{-\alpha} $$
+
+</div>
+
 ## <span id="202502021740"> GPT 1 2 3 </span>
 - OpenAI, 2018.6, 2019.2, 2020.5
 - (GPT 1) Improving Language Understanding by Generative Pre-Training
@@ -182,7 +194,9 @@ def positional_encoding(seq_length, d_model):
 - 基本所有的类GPT 1自回归生成LM每次都只预测一个token
 - 所有的类GPT 1自回归生成LM都是在推理(inference)时递归地生成内容，即在每一步预测时，模型输入的是之前所有生成的 token（加上可能的初始上下文），从而不断扩展文本，也就是说，推理时模型需要考虑所有过去生成的内容。但是在训练期间都使用teacher forcing，即使用真实的、已知的token序列作为输入
 - 所以为了节省资源，类GPT 1自回归生成LM可以缓存先前的K、V cache，每次只计算新的一个token的Q、K、V，并继续储存K、V
-
+- GPT 2指出语言模型的很多下游任务实际都可以用一种无监督的多任务学习方式学出来（这或许就是prompt的雏形），就是比如你想它做翻译，你就说：“从中文翻译成英文: 你是狗 =>”
+- GPT 2模型结构基本和GPT 1一样（当然肯定更大了），除了改了layer norm的位置到每个block前，并且在最后一个block之后加了一个layer norm，以及在初始化后，将残差层的权重除以n^0.5，n是残差层的层数
+- GPT 3提出了一种特殊的zero-shot、few-shot方式，他称其为in-context learning，就是在'prompt'里添加示例，不加示例就是zero，加多少个示例就是多少shot，比如以下one-shot例子：“从中文翻译成英文: 你是狗 => you are a dog 他是猪 =>”
 
 
 ## <span id="202502021741"> Training language models to follow instructions with human feedback </span>
