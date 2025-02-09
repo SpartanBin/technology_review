@@ -169,13 +169,33 @@ def positional_encoding(seq_length, d_model):
 ## <span id="202502091904"> Scaling Laws for Neural Language Models </span>
 - OpenAI, 2020.1
 - FLOPs即浮点运算次数，Transformer模型的前向传播中每个参数大约需要2次浮点运算，反向传播大约需要4次，从而每个参数每处理一个token总共约6次FLOPs（训练时），因此，训练过程中总计算量可以近似表示为，C = 6 * N * D，N是模型参数量，D是过模型的token数量
-- 训练(validation loss)损失与模型大小的倒数间基本呈正比关系（线性关系）
+- 当数据充分计算量充分的时候，训练(validation loss)损失与模型大小的幂函数的倒数间基本呈正比关系（线性关系）
 
 <div align="center">
 
 $$ L(N) \propto N^{-\alpha} $$
 
 </div>
+
+- 训练损失与数据量同上
+
+<div align="center">
+
+$$ L(D) \propto D^{-\beta} $$
+
+</div>
+
+- 计算量对损失的影响
+
+<div align="center">
+
+$$ L(C) \propto C^{-\gamma} $$
+
+</div>
+
+- 简而言之，训练模型结果是可以预测的（利用结构相同但是规模较小的模型结果），计算量上升模型表现也会上升，但是边际效应递减，并不能无限增大
+- 当预算有限的情况下，增大模型参数数量比增大数据量更有效
+- 小模型相比大模型更容易过拟合，大模型泛化的潜力更强
 
 ## <span id="202502021740"> GPT 1 2 3 </span>
 - OpenAI, 2018.6, 2019.2, 2020.5
