@@ -234,6 +234,21 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 ## <span id="202502021741"> Training language models to follow instructions with human feedback </span>
 - OpenAI, 2022.3
 
+<p align = "center">
+<img src=/img/InstructGPT_method.png width="600" />
+</p>
+
+- 第二步和第三步实际是迭代进行的，可能会循环多次
+- RM (reward model)和PPO (PPO policy)第一次训练的参数初始化都是来自于SFT (supervised fine-tuning model)，之和的训练相当于就是持续学习了 (continual learning)，不过只有RM会用到过去收集的数据，PPO不会（这还是遵循on-policy RL的规律）
+- 他只用了来自GPT 3的6B模型训练RM，他说175B不稳定
+- RM Loss
+
+<div align="center">
+
+$$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x_w,\, x_l) \sim D} \log \sigma\Big( r_{\theta}(x_w) - r_{\theta}(x_l) \Big) $$
+
+</div>
+
 ## <span id="202502021742"> Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback </span>
 - Anthropic, 2022.4
 
