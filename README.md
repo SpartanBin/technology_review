@@ -241,14 +241,11 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 - 第二步和第三步实际是迭代进行的，可能会循环多次
 - RM (reward model)和PPO (PPO policy)第一次训练的参数初始化都是来自于SFT (supervised fine-tuning model)，之和的训练相当于就是持续学习了 (continual learning)，不过只有RM会用到过去收集的数据，PPO不会（这还是遵循on-policy RL的规律）
 - 他只用了来自GPT 3的6B模型训练RM，他说175B不稳定
-- RM Loss
+- RM Loss，其中 (k 2) 是组合符号，表示从k个样本中选取两两配对的数量
 
 <div align="center">
 
-$$ 
-\mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x_w,\, x_l) \sim D} \log \sigma\Big( r_{\theta}(x_w) - r_{\theta}(x_l) \Big)
-<p> 其中，\(\binom{k}{2}\) 表示从 \(k\) 个样本中两两配对的总数；\( (x_w, x_l) \) 是数据集 \( D \) 中的一对样本（\(x_w\) 被认为比 \(x_l\) 更优）；\( r_{\theta}(x) \) 为奖励模型对输入 \(x\) 的输出；\(\sigma(\cdot)\) 为 sigmoid 函数。 </p>
-$$
+$$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x_w,\, x_l) \sim D} \log \sigma\Big( r_{\theta}(x, y_w) - r_{\theta}(x, y_l) \Big) $$
 
 </div>
 
