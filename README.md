@@ -245,7 +245,7 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 
 <div align="center">
 
-$$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(y_w, y_l, x) \sim D} \log \[\sigma\( r_{\theta}(x, y_w) - r_{\theta}(x, y_l) \)\] $$
+$$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \log \[\sigma\( r_{\theta}(x, y_w) - r_{\theta}(x, y_l) \)\] $$
 
 </div>
 
