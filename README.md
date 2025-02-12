@@ -253,7 +253,7 @@ $$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \lo
 
 <div align="center">
 
-$$ J(\theta) = \mathbb{E}_{x \sim D_{\text{RL}}} $$
+$$ \mathcal{Object}(\theta) = \E_{x \sim D_{\text{RL}}} $$
 
 </div>
 
