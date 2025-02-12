@@ -1,22 +1,22 @@
-# ***评论&笔记***
+# 评论&笔记
 
-- [Transformer (Google Brain, Google Research, 2017.6)](#Transformer)
-- [BERT (Google AI Language, 2018.10)](#BERT)
-- [ViT (Google Research, Brain, 2020.10)](#ViT)
-- [MAE (Facebook AI Research (FAIR), 2021.11)](#MAE)
-- [MoCo (Facebook AI Research (FAIR), 2019.11)](#MoCo)
-- [Swin Transformer (Microsoft Research Asia, 2021.3)](#Swin Transformer)
-- [CLIP (OpenAI, 2021.2)](#CLIP)
-- [Codex (OpenAI, 2021.7)](#Codex)
-- [AlphaCode (DeepMind, 2022.2)](#AlphaCode)
-- [Scaling Laws (OpenAI, 2020.1)](#Scaling Laws)
-- [T5 (Google, 2019.10)](#T5)
-- [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#GPT 1 2 3)
-- [InstructGPT (OpenAI, 2022.3)](#InstructGPT)
-- [Claude (Anthropic, 2022.4)](#Claude)
-- [Llama 3 (Meta, 2024.7)](#Llama 3)
-- [Mistral AI Models](README.md#*Mistral AI Models*)
-- [MoE (Google Brain, 2017.1)](#MoE)
+- [Transformer (Google Brain, Google Research, 2017.6)](#202502021731)
+- [BERT (Google AI Language, 2018.10)](#202502021732)
+- [ViT (Google Research, Brain, 2020.10)](#202502021733)
+- [MAE (Facebook AI Research (FAIR), 2021.11)](#202502021734)
+- [MoCo (Facebook AI Research (FAIR), 2019.11)](#202502021735)
+- [Swin Transformer (Microsoft Research Asia, 2021.3)](#202502021736)
+- [CLIP (OpenAI, 2021.2)](#202502021737)
+- [Codex (OpenAI, 2021.7)](#202502021738)
+- [AlphaCode (DeepMind, 2022.2)](#202502021739)
+- [Scaling Laws (OpenAI, 2020.1)](#202502091904)
+- [T5 (Google, 2019.10)](#202502092120)
+- [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
+- [InstructGPT (OpenAI, 2022.3)](#202502021741)
+- [Claude (Anthropic, 2022.4)](#202502021742)
+- [Llama 3 (Meta, 2024.7)](#202502021743)
+- [Mistral AI](#202502022356)
+- [MoE (Google Brain, 2017.1)](#202502050303)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
 - [DALL-E 1 2 3 (OpenAI)](#202502021745)
@@ -30,7 +30,7 @@
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
 
-# Attention Is All You Need
+## <span id="202502021731"> Attention Is All You Need </span>
 - Google Brain, Google Research, 2017.6
 
 <p align = "center">
@@ -132,7 +132,7 @@ def positional_encoding(seq_length, d_model):
 - div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))是在计算 10000^(2i/d_model) 的倒数，即 1 / (10000^(2i/d_model))，控制不同维度的位置编码缩放
 - 未解决的疑问：transformer原本是被设计出来解决翻译问题的，翻译问题的encoder输入肯定是被翻译语言，decoder的输入是什么？还有就是encoder的输入的L和decoder的L不一样长怎么办，是否要求一样长？
 
-# BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+## <span id="202502021732"> BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding </span>
 - Google AI Language, 2018.10
 
 <p align = "center">
@@ -146,28 +146,28 @@ def positional_encoding(seq_length, d_model):
 - bert的token中有三种特殊字符，分别是[CLS]、[SEP]和[MASK]，[CLS]的最终embedding用于下游分类任务，[SEP]放在一个句子的结尾（英文一个sequence可以最多由两个句子组成），[MASK]用于表示需要模型预测的词语（也就是预训练任务1拿去算loss的词语）
 - 预训练任务有两种，1上面有提到，2是NSP，就是判断sequence中句子B是不是句子A的下一句，为了下游任务的鲁棒性，任务1模型输入中需要预测的词语有80%会被换成[MASK]，有10%会变成一个随机词语，剩下的直接不替换
 
-# An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale
+## <span id="202502021733"> An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale </span>
 - Google Research, Brain, 2020.10
 
-# Masked Autoencoders Are Scalable Vision Learners
+## <span id="202502021734"> Masked Autoencoders Are Scalable Vision Learners </span>
 - Facebook AI Research (FAIR), 2021.11
 
-# Momentum Contrast for Unsupervised Visual Representation Learning
+## <span id="202502021735"> Momentum Contrast for Unsupervised Visual Representation Learning </span>
 - Facebook AI Research (FAIR), 2019.11
 
-# Swin Transformer: Hierarchical Vision Transformer using Shifted Windows
+## <span id="202502021736"> Swin Transformer: Hierarchical Vision Transformer using Shifted Windows </span>
 - Microsoft Research Asia, 2021.3
 
-# Learning Transferable Visual Models From Natural Language Supervision
+## <span id="202502021737"> Learning Transferable Visual Models From Natural Language Supervision </span>
 - OpenAI, 2021.2
 
-# Evaluating Large Language Models Trained on Code
+## <span id="202502021738"> Evaluating Large Language Models Trained on Code </span>
 - OpenAI, 2021.7
 
-# Competition-Level Code Generation with AlphaCode
+## <span id="202502021739"> Competition-Level Code Generation with AlphaCode </span>
 - DeepMind, 2022.2
 
-# Scaling Laws for Neural Language Models
+## <span id="202502091904"> Scaling Laws for Neural Language Models </span>
 - OpenAI, 2020.1
 - FLOPs即浮点运算次数，Transformer模型的前向传播中每个参数大约需要2次浮点运算，反向传播大约需要4次，从而每个参数每处理一个token总共约6次FLOPs（训练时），因此，训练过程中总计算量可以近似表示为，C = 6 * N * D，N是模型参数量，D是过模型的token数量
 - 当数据充分计算量充分的时候，训练(validation loss)损失与模型大小的幂函数的倒数间基本呈正比关系（线性关系）
@@ -198,10 +198,10 @@ $$ L(C) \propto C^{-\gamma} $$
 - 当预算有限的情况下，增大模型参数数量比增大数据量更有效
 - 小模型相比大模型更容易过拟合，大模型泛化的潜力更强
 
-# Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer
+## <span id="202502092120"> Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer </span>
 - Google, 2019.10
 
-# GPT 1 2 3
+## <span id="202502021740"> GPT 1 2 3 </span>
 - OpenAI, 2018.6, 2019.2, 2020.5
 - (GPT 1) Improving Language Understanding by Generative Pre-Training
 - (GPT 2) Language Models are Unsupervised Multitask Learners
@@ -231,7 +231,7 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 
 </div>
 
-# Training language models to follow instructions with human feedback
+## <span id="202502021741"> Training language models to follow instructions with human feedback </span>
 - OpenAI, 2022.3
 
 <p align = "center">
@@ -261,7 +261,7 @@ $$ \log(RL(x)) = \sum_{i=1}^{T} \log(\pi(x_i | x_{<i})) $$
 
 - 这篇文章写的确实相当具有迷惑性，一开始我以为他是把PPO的clip surrogate object改成了以上的object直接优化，但是仔细翻看了多遍，发现这个object真是个十分具有诱导性的说法，他这个object里，第一项作为reward肯定是无异议的，但是根据[原RLHF论文](https://arxiv.org/abs/2009.01325)，他还是个多步强化学习问题，这个reward只在最后一步奖励（但是他的gamma设置等于1），其他步大概率就是0奖励了，所以他才非要有一个value func做信用分配，当然他单步也避免了动作太多，求条件概率时多概率相乘导致数值溢出，第二项肯定不能作为reward奖励，所以第二项应该是在update参数的时候作为单独的一项与PPO的loss结合（类似于entropy loss），再结合原RLHF论文和[Anthropic RLHF](https://arxiv.org/abs/2204.05862)来看，他第一项中r_theta后面那一项应该是求这两个分布的KL divergence，所以比较合理的做法以Anthropic RLHF的reward作为reward，再把他这个公式中的第二项放在ppo loss里面（当然肯定得取个负号）
 
-# Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback
+## <span id="202502021742"> Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback </span>
 - Anthropic, 2022.4
 - 使用了[OOD detection techniques](https://arxiv.org/abs/2106.03004)来让模型回答：“不知道”，这个技术通常被称为ODIN(Out-of-Distribution detector for Neural networks)，它包含两个关键计算1.温度缩放(Temperature Scaling)2.输入扰动(Input Preprocessing)，整个过程简单来说就是让输入softmax之前的logits除以一个温度系数T（通常大于1），缩小概率分布的方差（差距），然后令被选出的类（概率最大的类）的对数概率对于输入x求导，令倒数乘以一个“步长”epsilon（一个较小的正数），然后用于改变x，最后再带入算softmax概率分布（依然要带入T），最大概率值小于阈值，则认为是OOD
 - 文章提到他们有部署在线上并且持续循环训练RM和RL policy的步骤，结果显著改善了模型
@@ -274,52 +274,52 @@ $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
 
 </div>
 
-# The Llama 3 Herd of Models
+## <span id="202502021743"> The Llama 3 Herd of Models </span>
 - Meta, 2024.7
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说文章没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
-# *Mistral AI Models*
+## <span id="202502022356"> Mistral AI Models </span>
 - Mistral AI
 - 是原Llama 1团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
 - 听说Mistral Large 2比Llama3.1擅长代码和数学
 
-# Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer
+## <span id="202502050303"> Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer </span>
 - Google Brain, 2017.1
 
-# Robust Speech Recognition via Large-Scale Weak Supervision
+## <span id="202502021744"> Robust Speech Recognition via Large-Scale Weak Supervision </span>
 - OpenAI, 2022.12
 
-# Noise2Music: Text-conditioned Music Generation with Diffusion Models
+## <span id="202502030008"> Noise2Music: Text-conditioned Music Generation with Diffusion Models </span>
 - Google Research, 2023.2
 - [paper](https://arxiv.org/abs/2302.03917)，[blog](https://google-research.github.io/noise2music/)
 
-# DALL-E 1 2 3
+## <span id="202502021745"> DALL-E 1 2 3 </span>
 - OpenAI
 
-# AlphaFold 1 2 3
+## <span id="202502021746"> AlphaFold 1 2 3 </span>
 - DeepMind
 
-# ViLT: Vision-and-Language Transformer Without Convolution or Region Supervision
+## <span id="202502021747"> ViLT: Vision-and-Language Transformer Without Convolution or Region Supervision </span>
 - Korea NAVER AI, 2021.2
 
-# Align before Fuse: Vision and Language Representation Learning with Momentum Distillation
+## <span id="202502021748"> Align before Fuse: Vision and Language Representation Learning with Momentum Distillation </span>
 - Salesforce Research, 2021.7
 
-# VLMo: Unified Vision-Language Pre-Training with Mixture-of-Modality-Experts
+## <span id="202502021749"> VLMo: Unified Vision-Language Pre-Training with Mixture-of-Modality-Experts </span>
 - Microsoft, 2021.11
 
-# BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation
+## <span id="202502021750"> BLIP: Bootstrapping Language-Image Pre-training for Unified Vision-Language Understanding and Generation </span>
 - Salesforce Research, 2022.1
 
-# CoCa: Contrastive Captioners are Image-Text Foundation Models
+## <span id="202502021751"> CoCa: Contrastive Captioners are Image-Text Foundation Models </span>
 - Google Research, 2022.5
 
-# Image as a Foreign Language: BEiT Pretraining for All Vision and Vision-Language Tasks
+## <span id="202502021752"> Image as a Foreign Language: BEiT Pretraining for All Vision and Vision-Language Tasks </span>
 - Microsoft Corporation, 2022.8
 
-# Movie Gen: A Cast of Media Foundation Models
+## <span id="202502021753"> Movie Gen: A Cast of Media Foundation Models </span>
 - Meta, 2024.10
 
-# HunyuanVideo: A Systematic Framework For Large Video Generative Models
+## <span id="202502021754"> HunyuanVideo: A Systematic Framework For Large Video Generative Models </span>
 - Tencent Hunyuan, 2024.12
