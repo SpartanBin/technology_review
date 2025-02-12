@@ -249,13 +249,17 @@ $$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \lo
 
 </div>
 
-- PPO-ptx Loss
+- PPO-ptx Loss，其中r_theta是reward model，RL是PPO policy，SFT是supervised fine-tuning policy (model)，beta和gamma是设置的系数，第一项的(x, y)是采样自SFT，第二项的x是采样自预训练数据集，原文表达不严谨，x和y实际都是token序列，并不是一步输出的，是多步输出的序列，所以这里的概率都是条件概率相乘，如下所示，所以项2相当于是最大化出现这一系列tokens（来自预训练数据）的概率，基本等价于原预训练loss，所以可以认为最大化这个Object，既起到了遵循RM指导的作用（并且不会过于偏离SFT），又起到了遵循预训练数据（分布）的作用
 
 <div align="center">
 
 $$ \mathcal{Object} = E_{(x, y) \sim D_{\text{RL}}}[r_{\theta} - \beta \log (RL(y | x) / SFT(y | x))] + \gamma E_{x \sim {\text{pretrain}}}[\log (RL(x))] $$
+$$ RL(x) = \prod_{i=1}^{T} \pi(x_i | x_{<i}) $$
+$$ \log(RL(x)) = \sum_{i=1}^{T} \log(\pi(x_i | x_{<i})) $$
 
 </div>
+
+- 另外如果是第一轮之后的训练，因为采样数据就来自PPO policy本身了，所以SFT应该需要替换成'The last PPO policy'
 
 ## <span id="202502021742"> Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback </span>
 - Anthropic, 2022.4
