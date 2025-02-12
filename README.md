@@ -15,7 +15,7 @@
 - [InstructGPT (OpenAI, 2022.3)](#InstructGPT)
 - [Claude (Anthropic, 2022.4)](#Claude)
 - [Llama 3 (Meta, 2024.7)](#Llama 3)
-- [Mistral AI Models](#Mistral_AI_Models)
+- [Mistral AI Models]( #Mistral AI Models)
 - [MoE (Google Brain, 2017.1)](#MoE)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
@@ -279,7 +279,7 @@ $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说文章没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
-# Mistral_AI_Models
+# Mistral AI Models
 - Mistral AI
 - 是原Llama 1团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
 - 听说Mistral Large 2比Llama3.1擅长代码和数学
