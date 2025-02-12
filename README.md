@@ -1,7 +1,7 @@
 # 评论&笔记
 
 - [Transformer (Google Brain, Google Research, 2017.6)](#202502021731)
-- [gitee](README.md#span-id202502021731-attention-is-all-you-need-span)
+- [gitee](README.md##giteee)
 - [BERT (Google AI Language, 2018.10)](#202502021732)
 - [ViT (Google Research, Brain, 2020.10)](#202502021733)
 - [MAE (Facebook AI Research (FAIR), 2021.11)](#202502021734)
@@ -32,6 +32,10 @@
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
 
 ## <span id="202502021731"> Attention Is All You Need </span>
+
+
+
+## giteee
 - Google Brain, Google Research, 2017.6
 
 <p align = "center">
