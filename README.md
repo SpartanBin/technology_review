@@ -15,7 +15,7 @@
 - [InstructGPT (OpenAI, 2022.3)](#InstructGPT)
 - [Claude (Anthropic, 2022.4)](#Claude)
 - [Llama 3 (Meta, 2024.7)](#Llama 3)
-- [Mistral AI Models]( #Mistral AI Models)
+- [Mistral AI Models](README.md#Mistral AI Models)
 - [MoE (Google Brain, 2017.1)](#MoE)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
