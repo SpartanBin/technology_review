@@ -253,7 +253,7 @@ $$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \lo
 
 <div align="center">
 
-$$ \mathcal{Object}(\theta) = E_{x \sim D_{\text{RL}}} $$
+$$ \mathcal{Object} = E_{(x, y) \sim D_{\text{RL}}}[r_{\theta} - \beta \log (RL(y | x) / SFT(y | x))] + \gamma E_{x \sim {\text{pretrain}}}[\log (RL(x))] $$
 
 </div>
 
