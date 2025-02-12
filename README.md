@@ -241,11 +241,19 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 - 第二步和第三步实际是迭代进行的，可能会循环多次
 - RM (reward model)和PPO (PPO policy)第一次训练的参数初始化都是来自于SFT (supervised fine-tuning model)，之和的训练相当于就是持续学习了 (continual learning)，不过只有RM会用到过去收集的数据，PPO不会（这还是遵循on-policy RL的规律）
 - 他只用了来自GPT 3的6B模型训练RM，他说175B不稳定
-- RM Loss，其中 (k 2) 是组合符号，表示从k个样本中选取两两配对的数量
+- RM Loss，其中 (k 2) 是组合符号，表示从k个样本中选取两两配对的数量，yw表示相比yl是更符合人类偏好的PPO policy生成的答案，r theta是RM，sigma是sigmoid函数
 
 <div align="center">
 
 $$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \log \[\sigma\( r_{\theta}(x, y_w) - r_{\theta}(x, y_l) \)\] $$
+
+</div>
+
+- PPO-ptx Loss
+
+<div align="center">
+
+$$ J(\theta) = \mathbb{E}_{x \sim D_{\text{RL}}}\!\Biggl[\; r(x)\; - \; \beta\, \log \frac{\pi_\theta(x)}{\pi_{\mathrm{SFT}}(x)} \Biggr] $$
 
 </div>
 
