@@ -262,6 +262,7 @@ $$ \mathcal{Object} = E_{(x, y) \sim D_{\text{RL}}}[r_{\theta} - \beta \log (RL(
 <div align="center">
 
 $$ RL(x) = \prod_{i=1}^{T} \pi(x_i | x_{<i}) $$
+
 $$ \log(RL(x)) = \sum_{i=1}^{T} \log(\pi(x_i | x_{<i})) $$
 
 </div>
