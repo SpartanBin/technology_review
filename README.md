@@ -270,7 +270,7 @@ $$ \log(RL(x)) = \sum_{i=1}^{T} \log(\pi(x_i | x_{<i})) $$
 
 <div align="center">
 
-$$ reward = r_PM - \lambda_KL D_KL(policy || policy_0) $$
+$$ reward = r_PM - \lambda_{KL} D_{KL}(policy || policy_0) $$
 
 </div>
 
