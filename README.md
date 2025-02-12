@@ -1,7 +1,7 @@
 # 评论&笔记
 
 - [Transformer (Google Brain, Google Research, 2017.6)](#202502021731)
-- [gitee](README.md#giteee)
+- [gitee](#giteee)
 - [BERT (Google AI Language, 2018.10)](#202502021732)
 - [ViT (Google Research, Brain, 2020.10)](#202502021733)
 - [MAE (Facebook AI Research (FAIR), 2021.11)](#202502021734)
