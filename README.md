@@ -253,7 +253,7 @@ $$ \mathcal{L}(\theta) = -\frac{1}{\binom{k}{2}} \sum_{(x, y_w, y_l) \sim D} \lo
 
 <div align="center">
 
-$$ J(\theta) = \mathbb{E}_{x \sim D_{\text{RL}}}\left[r(x) - \beta\, \log \frac{\pi_\theta(x)}{\pi_{\mathrm{SFT}}(x)}\right] $$
+$$ J(\theta) = \mathbb{E}_{x \sim D_{\text{RL}}} $$
 
 </div>
 
