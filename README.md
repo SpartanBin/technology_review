@@ -292,13 +292,22 @@ $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
 - LLaMA: Open and Efficient Foundation Language Models
 - Llama 2: Open Foundation and Fine-Tuned Chat Models
 - The Llama 3 Herd of Models
-- LLaMA和GPT 3一样使用Pre-normalization，也就是normalize transformer block的input而不是output，使用的是[RMSNorm](https://arxiv.org/abs/1910.07467)，首先我们回忆一下为什么要用LayerNorm，[因为神经网络会遇到内部协方差偏移的问题，每层输入的分布会因为前一层网络的参数更新而变](https://arxiv.org/abs/1502.03167)，以下是LayerNorm的计算方式，a是输入，a bar是输出，i表示向量（张量）中的第i个数值，g是用来重新缩放数值的参数，被初始化为1
+- LLaMA和GPT 3一样使用Pre-normalization，也就是normalize transformer block的input而不是output，使用的是[RMSNorm](https://arxiv.org/abs/1910.07467)，首先我们回忆一下为什么要用LayerNorm，[因为神经网络会遇到内部协方差偏移的问题，每层输入的分布会因为前一层网络的参数更新而变](https://arxiv.org/abs/1502.03167)，以下是LayerNorm的计算方式，a是输入，a bar是输出，i表示向量（张量）中的第i个数值，g是用来重新缩放数值的参数，被初始化为1，LayerNorm被认为有用的主要原因是其缩放不变性和中心化不变性
 
 <div align="center">
 
 $$ \overline{a}_i = \frac{a_i - \mu}{\sigma} g_i $$
 $$ \mu = \frac{1}{n} \sum_{i=1}^{n} a_i $$
 $$ \sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (a_i - \mu)^2} $$
+
+</div>
+
+- RMSNorm认为LayerNorm的中心化不变性没有用，所以他改成了
+
+<div align="center">
+
+$$ \overline{a}_i = \frac{a_i}{RMS} g_i $$
+$$ RMS = \sqrt{\frac{1}{n} \sum_{i=1}^{n} a_i^2} $$
 
 </div>
 
