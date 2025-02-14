@@ -309,7 +309,7 @@ $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
 - 每一个MoE层由一个或两个(two-level hierarchical MoE)门控单元和多个专家n组成，门控单元会经过softmax输出n个概率，然后启用top k个专家，把他们的输出结果求和作为输出，在这篇论文中他们的专家用的LSTM，门控就是线性变换
 - 原文提到他们是用类似dropout的机制实现的只让k个专家参与运算，可以想象相当于是不参与的就都不进行forward，然后他们会让gradient backward回来直接训练门控单元，而不是像[这篇论文](https://arxiv.org/abs/1511.06297)一样使用强化学习(Reinforce)训练
 - 然后他们为了不让门控单元只去依赖某几个专家，他们用了Noisy Top-K Gating，就是增加了一个可学习的噪声参数，并让噪声与原门口输出相加，再代入softmax
-- 文章说就算有Noisy Top-K Gating还是会有部分专家被过度依赖，因此提出了一个loss，我看loss大致就是把选出来的top k个概率求和，这样梯度下降应该就可以缩小这些概率，达到增强探索的目地，他新增的loss里面还有一些CV之类的不知道是运算还是符号，就没有看懂了
+- 文章说就算有Noisy Top-K Gating还是会有部分专家被过度依赖，因此提出了一个loss，我看loss大致就是把选出来的top k个概率求和，这样梯度下降应该就可以缩小这些概率，达到增强探索的目地，他新增的loss里面还有一些CV之类的不知道是运算符号还是系数，就没有看懂了
 
 ## <span id="202502021744"> Whisper </span>
 - OpenAI, 2022.12
