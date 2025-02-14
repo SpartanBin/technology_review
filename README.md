@@ -14,7 +14,7 @@
 - [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
 - [Claude (Anthropic, 2022.4)](#202502021742)
-- [Llama 1 2 3 (Meta, , , 2024.7)](#202502021743)
+- [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
 - [Mistral AI Models](#202502022356)
 - [MoE (Google Brain, 2017.1)](#202502050303)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
@@ -288,10 +288,22 @@ $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
 </div>
 
 ## <span id="202502021743"> Llama 1 2 3 </span>
-- Meta, , , 2024.7
+- Meta, 2023.2, 2023.7, 2024.7
+- LLaMA: Open and Efficient Foundation Language Models
+- Llama 2: Open Foundation and Fine-Tuned Chat Models
 - The Llama 3 Herd of Models
+- LLaMA和GPT 3一样使用Pre-normalization，也就是normalize transformer block的input而不是output，使用的是[RMSNorm](https://arxiv.org/abs/1910.07467)，首先我们回忆一下为什么要用LayerNorm，[因为神经网络会遇到内部协方差偏移的问题，每层输入的分布会因为前一层网络的参数更新而变](https://arxiv.org/abs/1502.03167)，以下是LayerNorm的计算方式，a是输入，a bar是输出，i表示向量（张量）中的第i个数值，g是用来重新缩放数值的参数，被初始化为1
+
+<div align="center">
+
+$$ \overline{a}_i = \frac{a_i - \mu}{\sigma} g_i $$
+$$ \mu = \frac{1}{n} \sum_{i=1}^{n} a_i $$
+$$ \sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (a_i - \mu)^2} $$
+
+</div>
+
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
-- 沐神说文章没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
+- 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
 ## <span id="202502022356"> Mistral AI Models </span>
 - Mistral AI
