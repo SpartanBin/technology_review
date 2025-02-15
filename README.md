@@ -311,6 +311,17 @@ $$ RMS = \sqrt{\frac{1}{n} \sum_{i=1}^{n} a_i^2} $$
 
 </div>
 
+- LLaMA使用了[SwiGLU](https://arxiv.org/abs/2002.05202)激活函数替换ReLU，见以下FFN (feed forward network)，Swish 1就是Swish beta，beta等于1
+
+<div align="center">
+
+$$ FFN_ReLU(x, W1, W2) = max(xW1, 0)W2 $$
+$$ FFN_SwiGLU(x, W, V, W2) = (Swish_1(xW) ⊗ xV)W2 $$
+$$ SwiGLU(x, W, V, b, c, \beta) = Swish_{\beta} (xW + b) ⊗ (xV + c) $$
+$$ Swish_{\beta} (x) = x\sigma(\beta x) $$
+
+</div>
+
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
