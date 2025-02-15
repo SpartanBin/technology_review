@@ -17,6 +17,7 @@
 - [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
 - [Mistral AI Models](#202502022356)
 - [MoE (Google Brain, 2017.1)](#202502050303)
+- [Flamingo (DeepMind, 2022.4)](#202502151055)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
 - [DALL-E 1 2 3 (OpenAI)](#202502021745)
@@ -311,14 +312,23 @@ $$ RMS = \sqrt{\frac{1}{n} \sum_{i=1}^{n} a_i^2} $$
 
 </div>
 
-- LLaMA使用了[SwiGLU](https://arxiv.org/abs/2002.05202)激活函数替换ReLU，见以下FFN (feed forward network)，Swish 1就是Swish beta，beta等于1，当beta不设置为1时，他是个可学习参数
+- LLaMA使用了[SwiGLU](https://arxiv.org/abs/2002.05202)激活函数替换ReLU，见以下FFN (feed forward network)，Swish 1就是Swish beta，beta等于1，当beta不设置为1时，他是个可学习参数，*代表逐元素乘法（Hadamard乘积），他原文这里用的是外积符号⊗，两个向量的外积结果是矩阵，内积结果是标量，都不合理
 
 <div align="center">
 
 $$ FFN_{ReLU} (x, W_1, W_2) = max(xW_1, 0)W_2 $$
-$$ FFN_{SwiGLU} (x, W, V, W_2) = (Swish_1(xW) ⊗ xV)W_2 $$
-$$ SwiGLU(x, W, V, b, c, \beta) = Swish_{\beta} (xW + b) ⊗ (xV + c) $$
+$$ FFN_{SwiGLU} (x, W, V, W_2) = (Swish_1(xW) * xV)W_2 $$
+$$ SwiGLU(x, W, V, b, c, \beta) = Swish_{\beta} (xW + b) * (xV + c) $$
 $$ Swish_{\beta} (x) = x\sigma(\beta x) $$
+
+</div>
+
+- LLaMA使用了[RoPE (rotary positional embedding)](https://arxiv.org/abs/2104.09864)替换PE (absolute positional embeddings)，RoPE和PE在用法上就有直接的区别，PE是在带入multi-head之前就对输入x编码了，而RoPE是在计算完qkv之后，仅对q和k编码，这也很好理解，因为只有qk才会乘在一起得到权重矩阵，相对位置信息理应只需要保留在这个权重里面，q和k在乘以他们的绝对位置（旋转矩阵）之后，再算注意力权重矩阵时会再相乘，得到的就是相对位置了（公式由GPT生成），代码实现详见[torchtune](https://pytorch.org/torchtune/main/_modules/torchtune/modules/position_embeddings.html#RotaryPositionalEmbeddings)
+
+<div align="center">
+
+$$ (R(\theta_i)Q_i)^\mathrm T (R(\theta_j)K_j) = Q_i^\mathrm T R(\theta_i)^\mathrm T R(\theta_j)K_j $$
+$$ R(\theta_i)^\mathrm T R(\theta_j) = R(\theta_j - \theta_i) $$
 
 </div>
 
@@ -342,6 +352,10 @@ $$ Swish_{\beta} (x) = x\sigma(\beta x) $$
 - 原文提到他们是用类似dropout的机制实现的只让k个专家参与运算，可以想象相当于是不参与的就都不进行forward，然后他们会让gradient backward回来直接训练门控单元，而不是像[这篇论文](https://arxiv.org/abs/1511.06297)一样使用强化学习(Reinforce)训练
 - 然后他们为了不让门控单元只去依赖某几个专家，他们用了Noisy Top-K Gating，就是增加了一个可学习的噪声参数，并让噪声与原门口输出相加，再代入softmax
 - 文章说就算有Noisy Top-K Gating还是会有部分专家被过度依赖，因此提出了一个loss，我看loss大致就是把选出来的top k个概率求和，这样梯度下降应该就可以缩小这些概率，达到增强探索的目地，他新增的loss里面还有一些CV之类的不知道是运算符号还是系数，就没有看懂了
+
+## <span id="202502151055"> Flamingo </span>
+- DeepMind, 2022.4
+- Flamingo: a Visual Language Model for Few-Shot Learning
 
 ## <span id="202502021744"> Whisper </span>
 - OpenAI, 2022.12
