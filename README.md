@@ -332,6 +332,19 @@ $$ R(\theta_i)^\mathrm T R(\theta_j) = R(\theta_j - \theta_i) $$
 
 </div>
 
+- LLaMA使用了[AdamW optimizer](https://arxiv.org/abs/1711.05101)，AdamW和Adam的区别简单来说就是，AdamW通过将权重衰减与梯度更新分离，解决了Adam中权重衰减实现不理想的问题
+- LLaMA使用了cosine learning rate schedule，可以用[torchtune的CosineAnnealingLR](https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html#torch.optim.lr_scheduler.CosineAnnealingLR)，只是warm-up要自己实现，LLaMA也使用了warm-up，warm-up指的是训练初期使用较小的学习率，并逐步增加到预设的最大学习率，通常是线性或指数增长策略
+
+<div align="center">
+
+$$ lr(t) = \eta_{min} + \frac{1}{2} (\eta_{max} - \eta_{min})(1 + cos(\frac{\pi t}{T})) $$
+
+</div>
+
+- LLaMA使用了weight decay of 0.1 and gradient clipping of 1.0，weight decay of 0.1就是对模型权重做软约束，在loss中添加模型权重的L2范数正则化项，0.1就是LLaMA使用的这一项前面的系数
+- LLaMA借鉴了[causal multi-head attention](https://arxiv.org/abs/2112.05682)和[FlashAttention](https://arxiv.org/abs/2205.14135)的高效实现，实现了xFormers中的[Memory-efficient attention](https://facebookresearch.github.io/xformers/components/ops.html)并用在模型中，通过分块计算和在线累加等方式，优化了内存占用，使模型能够处理更长序列
+- LLaMA优化了activations重计算的问题来加速训练，也就是把一些复杂的activations存下来，就不需要在backward的时候再算一遍，就像[这篇文章](https://arxiv.org/abs/2205.05198)中讨论的那样
+- LLaMA进行了极少量（和预训练数据相比）的指令微调 (instruction finetuning)来测试模型在MMLU等数据集上的表现，方法参考[这篇论文](https://arxiv.org/abs/2210.11416)，简单来说，像GPT 3中的few-shot learning的例子你如果把它拿来训练模型，这就属于指令微调，InstructGPT中的SFT也属于指令微调
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
