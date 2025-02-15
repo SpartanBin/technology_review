@@ -311,12 +311,12 @@ $$ RMS = \sqrt{\frac{1}{n} \sum_{i=1}^{n} a_i^2} $$
 
 </div>
 
-- LLaMA使用了[SwiGLU](https://arxiv.org/abs/2002.05202)激活函数替换ReLU，见以下FFN (feed forward network)，Swish 1就是Swish beta，beta等于1
+- LLaMA使用了[SwiGLU](https://arxiv.org/abs/2002.05202)激活函数替换ReLU，见以下FFN (feed forward network)，Swish 1就是Swish beta，beta等于1，当beta不设置为1时，他是个可学习参数
 
 <div align="center">
 
-$$ FFN_ReLU(x, W1, W2) = max(xW1, 0)W2 $$
-$$ FFN_SwiGLU(x, W, V, W2) = (Swish_1(xW) ⊗ xV)W2 $$
+$$ FFN_{ReLU} (x, W_1, W_2) = max(xW_1, 0)W_2 $$
+$$ FFN_{SwiGLU} (x, W, V, W_2) = (Swish_1(xW) ⊗ xV)W_2 $$
 $$ SwiGLU(x, W, V, b, c, \beta) = Swish_{\beta} (xW + b) ⊗ (xV + c) $$
 $$ Swish_{\beta} (x) = x\sigma(\beta x) $$
 
