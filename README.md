@@ -10,6 +10,7 @@
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
+- [Toolformer (Meta AI Research, 2023.2)](#202502151904)
 - [T5 (Google, 2019.10)](#202502092120)
 - [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
@@ -208,6 +209,29 @@ $$ L(C) \propto C^{-\gamma} $$
 - 简而言之，训练模型结果是可以预测的（利用结构相同但是规模较小的模型结果），计算量上升模型表现也会上升，但是边际效应递减，并不能无限增大
 - 当预算有限的情况下，增大模型参数数量比增大数据量更有效
 - 小模型相比大模型更容易过拟合，大模型泛化的潜力更强
+
+## <span id="202502151904"> Toolformer </span>
+- Meta AI Research, 2023.2
+- Toolformer: Language Models Can Teach Themselves to Use Tools
+
+<p align = "center">
+<img src=/img/toolformer_step.png width="800" />
+</p>
+
+- 这篇论文的重点主要是在讲他们是如何构建这个调用API的数据集的，主要包含3个步骤，之后的微调方式和预训练方式无异
+
+<p align = "center">
+<img src=/img/toolformer_prompt.png width="400" />
+</p>
+
+- 第一步是给模型一个few-shot的prompt，让模型自己标注一下需要使用API的位置，第二步是执行API调用
+
+<p align = "center">
+<img src=/img/toolformer_data.png width="400" />
+</p>
+
+- 第三步是过滤前两步产生的样本，方法是用weighted cross entropy计算在调用API后的tokens的对数概率之和（后验概率）取负数L（x1:i−1, e(ci, ri), xi:n，e(ci, ri)是调用API的语句和收到的结果，也就是xi:n这一段tokens），一共要计算三种，第一种是包含完整e(ci, ri)的，第二种是不包含e(ci, ri)的，第三种是API不给回复的，也就是不包含ri的，第二三种取最小值得到L''，令第一种为L'，设置一个阈值tau，只保留L'' - L' > tau的样本，这一通操作也很好理解，简单来说就是只保留调用API对生成后续内容有帮助的样本
+- 微调的时候同时需要在上面得到的数据集里加入没有调取API的样本（来自预训练）
 
 ## <span id="202502092120"> T5 </span>
 - Google, 2019.10
