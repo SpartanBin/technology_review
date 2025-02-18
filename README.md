@@ -371,8 +371,8 @@ $$ lr(t) = \eta_{min} + \frac{1}{2} (\eta_{max} - \eta_{min})(1 + cos(\frac{\pi 
 - LLaMA进行了极少量（和预训练数据相比）的指令微调 (instruction finetuning)来测试模型在MMLU等数据集上的表现，方法参考[这篇论文](https://arxiv.org/abs/2210.11416)，简单来说，像GPT 3中的few-shot learning的例子你如果把它拿来训练模型，这就属于指令微调，InstructGPT中的SFT也属于指令微调
 
 <p align = "center">
-<img src=/img/llama_1vs2.png width="500" />
-<img src=/img/llama_2step.png width="500" />
+<img src=/img/llama_1vs2.png width="600" />
+<img src=/img/llama_2step.png width="600" />
 </p>
 
 - Llama 2和LLaMA的预训练方式、SFT（指令微调）、模型等基本一样，但是Llama 2使用了更多的数据，提高了context length，使用了grouped-query attention (GQA)，还用了RLHF，不过他和Claude更像，也是去对齐helpfulness and safety
