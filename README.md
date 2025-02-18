@@ -369,6 +369,26 @@ $$ lr(t) = \eta_{min} + \frac{1}{2} (\eta_{max} - \eta_{min})(1 + cos(\frac{\pi 
 - LLaMA借鉴了[causal multi-head attention](https://arxiv.org/abs/2112.05682)和[FlashAttention](https://arxiv.org/abs/2205.14135)的高效实现，实现了xFormers中的[Memory-efficient attention](https://facebookresearch.github.io/xformers/components/ops.html)并用在模型中，通过分块计算和在线累加等方式，优化了内存占用，使模型能够处理更长序列
 - LLaMA优化了activations重计算的问题来加速训练，也就是把一些复杂的activations存下来，就不需要在backward的时候再算一遍，就像[这篇文章](https://arxiv.org/abs/2205.05198)中讨论的那样
 - LLaMA进行了极少量（和预训练数据相比）的指令微调 (instruction finetuning)来测试模型在MMLU等数据集上的表现，方法参考[这篇论文](https://arxiv.org/abs/2210.11416)，简单来说，像GPT 3中的few-shot learning的例子你如果把它拿来训练模型，这就属于指令微调，InstructGPT中的SFT也属于指令微调
+
+<p align = "center">
+<img src=/img/llama_1vs2.png width="500" />
+<img src=/img/llama_2step.png width="500" />
+</p>
+
+- Llama 2和LLaMA的预训练方式、SFT（指令微调）、模型等基本一样，但是Llama 2使用了更多的数据，提高了context length，使用了grouped-query attention (GQA)，还用了RLHF，不过他和Claude更像，也是去对齐helpfulness and safety
+- grouped-query attention (GQA)就是将multi-head多头分成多个组，q是独立的和以前一样，但是同一个组内的kv共享参数，可以节约计算和储存kv cache的开销
+- Llama 2发现只需要少量的高质量对话数据用做SFT，就可以让模型学会高质量的对话，比如数万的数量就可以，他们只用了27540个，他们做SFT时，初始学习率降低成0.00002，使用0.1的L2正则，64的batch size和4096的context length，还有2 epochs
+- Llama 2训练了2个RM，一个Helpfulness RM，另一个Safety RM，他们请人标注是像Claude那样成对标注的（分成了几个等级，比如好很多，好一点，差不多，差一点），然后训练RM的目标是改进自InstructGPT的目标，y_c是更符合偏好的生成，m(r)是离散的等级差距函数，他们训练RM还结合了开源数据，最后他们以分段函数的形式结合了两个RM，分段的中心思想就是优先关注安全，再是有用
+
+<div align="center">
+
+$$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
+
+</div>
+
+- Llama 2使用了两种RL的方法，一种就是PPO，另一种是Rejection Sampling fine-tuning（RS），在前几轮里只用RS，后面把PPO用到RS的最优结果上，然后他们最大的模型才用了RS，小的模型都是使用的大模型RS的样本（他们称此为蒸馏 distillation）
+- Rejection Sampling fine-tuning（RS）就是对一个prompt生成多个回答，然后选出RM评分最高的那个，然后用最大化对数概率之和训练（这个是我猜的，因为他毕竟叫fine-tuning，原文又没写）
+- Llama 2使用提出了一个叫 Ghost Attention (GAtt)的方法，以用来让模型一直重点关注某些提示，比如扮演成某个名人等，他的做法没有看懂，似乎是不断简洁精炼这些重要的系统提示，然后再与后续的对话拼接在一起？
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
 
