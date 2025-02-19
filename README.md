@@ -264,11 +264,14 @@ $$ RATE(y) = \log\frac{\pi_{\theta}(y | x)}{\pi_{ref}(y | x)} $$
 
 </div>
 
-- 对DPO的loss求导
+- 对DPO的loss求导，可以发现最小化loss时，项2 (Item 2)是在最大化yw的可能性，项3是最小化yl的可能性，项1是隐式的奖励，由KL divergence决定，用来决定最大最小化的强度
 
 <div align="center">
 
 $$ \mathcal{grad} = -\beta E_{(x, y_w, y_l) \sim D} [Item_1 \times (Item_2 + Item_3)] $$
+$$ Item_1 = \sigma (\beta RATE(y_l) - \beta RATE(y_w)) $$
+$$ Item_2 = \nabla_{\theta} \log \pi (y_w | x) $$
+$$ Item_3 = -\nabla_{\theta} \log \pi (y_l | x) $$
 
 </div>
 
