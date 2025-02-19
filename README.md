@@ -255,12 +255,20 @@ $$ L(C) \propto C^{-\gamma} $$
 <img src=/img/DPO_RLHFvsDPO.png width="1000" />
 </p>
 
-- DPO的loss
+- DPO的loss，其中yw比起yl是更符合偏好的样本，Π theta是要训练的模型，Π ref是不能偏离太远的参考模型（比如SFT），beta是系数用来scale
 
 <div align="center">
 
-$$ \mathcal{L_{DPO}} = E_{(x, y_w, y_l) \sim D} \big[\log\sigma \big(\beta RATE(y_w) - \beta RATE(y_l) \big) \big] $$
+$$ \mathcal{L_{DPO}} = -E_{(x, y_w, y_l) \sim D} \big[\log\sigma \big(\beta RATE(y_w) - \beta RATE(y_l) \big) \big] $$
 $$ RATE(y) = \log\frac{\pi_{\theta}(y | x)}{\pi_{ref}(y | x)} $$
+
+</div>
+
+- 对DPO的loss求导
+
+<div align="center">
+
+$$ \mathcal{grad} = -\beta E_{(x, y_w, y_l) \sim D} [Item_1 \times (Item_2 + Item_3)] $$
 
 </div>
 
