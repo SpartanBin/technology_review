@@ -10,7 +10,9 @@
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
+- [Chain-of-Thought (Google Research, Brain, 2022.1)](#202502191230)
 - [Toolformer (Meta AI Research, 2023.2)](#202502151904)
+- [DPO (Stanford University, 2023.5)](#202502191442)
 - [T5 (Google, 2019.10)](#202502092120)
 - [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
@@ -210,6 +212,18 @@ $$ L(C) \propto C^{-\gamma} $$
 - 当预算有限的情况下，增大模型参数数量比增大数据量更有效
 - 小模型相比大模型更容易过拟合，大模型泛化的潜力更强
 
+## <span id="202502191230"> Chain-of-Thought </span>
+- Google Research, Brain, 2022.1
+- Chain-of-Thought Prompting Elicits Reasoning in Large Language Models
+
+<p align = "center">
+<img src=/img/chain-of-thought_eg.png width="800" />
+</p>
+
+- 思维链就是给模型prompt包含一些例子，这些例子首先和问题相关，其次这些例子包含从问题到答案的思考步骤
+- 文章说足够大的模型能够在回答问题时复现出思维链思考步骤，从而提高正确率
+- 感觉用这个技术的难点显而易见，就是需要人来标注这些精心准备的提示示例，而且还需要提前知晓用户会问什么问题，为每个问题准备好示例
+
 ## <span id="202502151904"> Toolformer </span>
 - Meta AI Research, 2023.2
 - Toolformer: Language Models Can Teach Themselves to Use Tools
@@ -232,6 +246,22 @@ $$ L(C) \propto C^{-\gamma} $$
 
 - 第三步是过滤前两步产生的样本，方法是用weighted cross entropy计算在调用API后的tokens的带权重的对数概率之和（如果不带权重就相当于是后验概率，不理解为什么要加权重，文章也没有说权重怎么设置）取负数L（x1:i−1, e(ci, ri), xi:n，e(ci, ri)是调用API的语句和收到的结果，也就是xi:n这一段tokens），一共要计算三种，第一种是包含完整e(ci, ri)的，第二种是不包含e(ci, ri)的，第三种是API不给回复的，也就是不包含ri的，第二三种取最小值得到L''，令第一种为L'，设置一个阈值tau，只保留L'' - L' > tau的样本，这一通操作也很好理解，简单来说就是只保留调用API对生成后续内容有帮助的样本
 - 微调的时候同时需要在上面得到的数据集里加入没有调取API的样本（来自预训练）
+
+## <span id="202502191442"> DPO </span>
+- Stanford University, 2023.5
+- Direct Preference Optimization: Your Language Model is Secretly a Reward Model
+
+<p align = "center">
+<img src=/img/DPO_RLHFvsDPO.png width="1000" />
+</p>
+
+- DPO的loss
+
+<div align="center">
+
+$$ \mathcal{L_{DPO}} = E_{(x, y_w, y_l) \sim D}[\log ( \sigma (\beta\log(\frac{\pi_{\theta}(y_w | x)}{\pi_{\ref}(y_w | x)}) - \beta\log(\frac{\pi_{\theta}(y_l | x)}{\pi_{\ref}(y_l | x)})))] $$
+
+</div>
 
 ## <span id="202502092120"> T5 </span>
 - Google, 2019.10
@@ -278,7 +308,7 @@ $$ S'(Y) = S(Y) \div (T^\alpha) $$
 - 第二步和第三步实际是迭代进行的，可能会循环多次
 - RM (reward model)和PPO policy第一次训练的参数初始化都是来自于SFT (supervised fine-tuning model)，但是PPO value func都是初始化自RM，之和的训练相当于就是持续学习了 (continual learning)，不过只有RM会用到过去收集的数据，PPO不会（这还是遵循on-policy RL的规律）
 - 他只用了来自GPT 3的6B模型训练RM，他说175B不稳定
-- RM Loss，其中 (k 2) 是组合符号，表示从k个样本中选取两两配对的数量，yw表示相比yl是更符合人类偏好的PPO policy生成的答案，r theta是RM，sigma是sigmoid函数
+- RM Loss，其中 (k 2) 是组合符号，表示从k个样本中选取两两配对的数量，yw表示相比yl是更符合人类偏好的PPO policy生成的答案，r theta是RM，sigma是逻辑斯谛函数 (logistic function)
 
 <div align="center">
 
@@ -391,6 +421,7 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Llama 2使用提出了一个叫 Ghost Attention (GAtt)的方法，以用来让模型一直重点关注某些提示，比如扮演成某个名人等，他的做法没有看懂，似乎是不断简洁精炼这些重要的系统提示，然后再与后续的对话拼接在一起？
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
+- 
 
 ## <span id="202502022356"> Mistral AI Models </span>
 - Mistral AI
