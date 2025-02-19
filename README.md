@@ -260,7 +260,7 @@ $$ L(C) \propto C^{-\gamma} $$
 <div align="center">
 
 $$ \mathcal{L_{DPO}} = E_{(x, y_w, y_l) \sim D} \big[\log\sigma \big(\beta RATE(y_w) - \beta RATE(y_l) \big) \big] $$
-$$ RATE(y) = \log(\frac{\pi_{\theta}(y_l | x)}{\pi_{\ref}(y_l | x)}) $$
+$$ RATE(y) = \log(\frac{\pi_{\theta}(y | x)}{\pi_{\ref}(y | x)}) $$
 
 </div>
 
