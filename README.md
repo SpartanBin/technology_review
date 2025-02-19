@@ -354,6 +354,8 @@ $$ Item_3 = -\nabla_{\theta} \log \pi (y_l | x) $$
 
 </div>
 
+- 文章说实际使用时，你可能会去互联网上下载开源数据，用开源数据的时候，你就没有Π ref了，那你需要initialize Π ref by maximizing likelihood of preferred completions (x, yw)，就是最大化生成符合偏好样本的对数概率之和，我猜他可能是要让你用自己的模型根据开源偏好数据和该优化目标微调一下得到Π ref
+
 ## <span id="202502021743"> Llama 1 2 3 </span>
 - Meta, 2023.2, 2023.7, 2024.7
 - LLaMA: Open and Efficient Foundation Language Models
