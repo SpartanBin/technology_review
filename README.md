@@ -259,7 +259,7 @@ $$ L(C) \propto C^{-\gamma} $$
 
 <div align="center">
 
-$$ \mathcal{L_{DPO}} = E_{(x, y_w, y_l) \sim D}[\log ( \sigma (\beta\log(\frac{\pi_{\theta}(y_w | x)}{\pi_{\ref}(y_w | x)}) - \beta\log(\frac{\pi_{\theta}(y_l | x)}{\pi_{\ref}(y_l | x)})))] $$
+$$ \mathcal{L_{DPO}} = E_{(x, y_w, y_l) \sim D}(\log ( \sigma (\beta\log(\frac{\pi_{\theta}(y_w | x)}{\pi_{\ref}(y_w | x)}) - \beta\log(\frac{\pi_{\theta}(y_l | x)}{\pi_{\ref}(y_l | x)})))) $$
 
 </div>
 
