@@ -12,11 +12,11 @@
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
 - [Chain-of-Thought (Google Research, Brain, 2022.1)](#202502191230)
 - [Toolformer (Meta AI Research, 2023.2)](#202502151904)
-- [DPO (Stanford University, 2023.5)](#202502191442)
 - [T5 (Google, 2019.10)](#202502092120)
 - [GPT 1 2 3 (OpenAI, 2018.6, 2019.2, 2020.5)](#202502021740)
 - [InstructGPT (OpenAI, 2022.3)](#202502021741)
 - [Claude (Anthropic, 2022.4)](#202502021742)
+- [DPO (Stanford University, 2023.5)](#202502191442)
 - [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
 - [Mistral AI Models](#202502022356)
 - [MoE (Google Brain, 2017.1)](#202502050303)
@@ -247,34 +247,6 @@ $$ L(C) \propto C^{-\gamma} $$
 - 第三步是过滤前两步产生的样本，方法是用weighted cross entropy计算在调用API后的tokens的带权重的对数概率之和（如果不带权重就相当于是后验概率，不理解为什么要加权重，文章也没有说权重怎么设置）取负数L（x1:i−1, e(ci, ri), xi:n，e(ci, ri)是调用API的语句和收到的结果，也就是xi:n这一段tokens），一共要计算三种，第一种是包含完整e(ci, ri)的，第二种是不包含e(ci, ri)的，第三种是API不给回复的，也就是不包含ri的，第二三种取最小值得到L''，令第一种为L'，设置一个阈值tau，只保留L'' - L' > tau的样本，这一通操作也很好理解，简单来说就是只保留调用API对生成后续内容有帮助的样本
 - 微调的时候同时需要在上面得到的数据集里加入没有调取API的样本（来自预训练）
 
-## <span id="202502191442"> DPO </span>
-- Stanford University, 2023.5
-- Direct Preference Optimization: Your Language Model is Secretly a Reward Model
-
-<p align = "center">
-<img src=/img/DPO_RLHFvsDPO.png width="1000" />
-</p>
-
-- DPO的loss，其中yw比起yl是更符合偏好的样本，Π theta是要训练的模型，Π ref是不能偏离太远的参考模型（比如SFT），beta是系数用来scale
-
-<div align="center">
-
-$$ \mathcal{L_{DPO}} = -E_{(x, y_w, y_l) \sim D} \big[\log\sigma \big(\beta RATE(y_w) - \beta RATE(y_l) \big) \big] $$
-$$ RATE(y) = \log\frac{\pi_{\theta}(y | x)}{\pi_{ref}(y | x)} $$
-
-</div>
-
-- 对DPO的loss求导，可以发现最小化loss时，项2 (Item 2)是在最大化yw的可能性，项3是最小化yl的可能性，项1是隐式的奖励，由KL divergence决定，用来决定最大最小化的强度
-
-<div align="center">
-
-$$ \mathcal{grad} = -\beta E_{(x, y_w, y_l) \sim D} [Item_1 \times (Item_2 + Item_3)] $$
-$$ Item_1 = \sigma (\beta RATE(y_l) - \beta RATE(y_w)) $$
-$$ Item_2 = \nabla_{\theta} \log \pi (y_w | x) $$
-$$ Item_3 = -\nabla_{\theta} \log \pi (y_l | x) $$
-
-</div>
-
 ## <span id="202502092120"> T5 </span>
 - Google, 2019.10
 - Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer
@@ -351,6 +323,34 @@ $$ \log(RL(x)) = \sum_{i=1}^{T} \log(\pi(x_i | x_{<i})) $$
 <div align="center">
 
 $$ reward = r_{PM} - \lambda_{KL} D_{KL}(policy || policy_0) $$
+
+</div>
+
+## <span id="202502191442"> DPO </span>
+- Stanford University, 2023.5
+- Direct Preference Optimization: Your Language Model is Secretly a Reward Model
+
+<p align = "center">
+<img src=/img/DPO_RLHFvsDPO.png width="1000" />
+</p>
+
+- DPO的loss，其中yw比起yl是更符合偏好的样本，Π theta是要训练的模型，Π ref是不能偏离太远的参考模型（比如SFT），beta是系数用来scale
+
+<div align="center">
+
+$$ \mathcal{L_{DPO}} = -E_{(x, y_w, y_l) \sim D} \big[\log\sigma \big(\beta RATE(y_w) - \beta RATE(y_l) \big) \big] $$
+$$ RATE(y) = \log\frac{\pi_{\theta}(y | x)}{\pi_{ref}(y | x)} $$
+
+</div>
+
+- 对DPO的loss求导，可以发现最小化loss时，项2 (Item 2)是在最大化yw的可能性，项3是最小化yl的可能性，项1是隐式的奖励，由KL divergence决定，用来决定最大最小化的强度
+
+<div align="center">
+
+$$ \mathcal{grad} = -\beta E_{(x, y_w, y_l) \sim D} [Item_1 \times (Item_2 + Item_3)] $$
+$$ Item_1 = \sigma (\beta RATE(y_l) - \beta RATE(y_w)) $$
+$$ Item_2 = \nabla_{\theta} \log \pi (y_w | x) $$
+$$ Item_3 = -\nabla_{\theta} \log \pi (y_l | x) $$
 
 </div>
 
