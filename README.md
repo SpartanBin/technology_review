@@ -435,7 +435,20 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Llama 2使用提出了一个叫 Ghost Attention (GAtt)的方法，以用来让模型一直重点关注某些提示，比如扮演成某个名人等，他的做法没有看懂，似乎是不断简洁精炼这些重要的系统提示，然后再与后续的对话拼接在一起？
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
-- 
+- Llama 3论文做了比较详细的数据清洗和分类（详见原文），包括各种去重，基于模型的筛选，基于模型的专门从网页提取代码推理数据，基于模型的知识分类，基于scaling laws的最佳知识混合方法，最后得到的比例是50%的通用知识，25%的数学和推理，17%的代码和8%的多语言，以及使用了退火数据，就是在不同训练阶段使用了不同质量不同难度的数据，比如初期应该多用高质量低难度的数据
+- Llama 3使用了传统transformer (dense transformer)架构，使用了GQA，使用了attention mask去遮罩同一个序列中来自不同文档的tokens，让他们不要互相关注，这个技术在长上下文里至关重要，因为在Llama 3中，对于405B的模型来说，在standard pre-training stage上下文是8k，在continued pre-training stage是128k，使用了RoPE
+
+<p align = "center">
+<img src=/img/llama_3size.png width="600" />
+</p>
+
+- Llama 3还说他们的budget是3.8*10^25 FLOPs，根据scaling laws和他们的数据量，405B大小是最好的选择，他们认为以前的scaling laws已经不奏效了，原因是以前的测试预算都很小，而且是以预训练数据作为validation loss，他们为此设计了自己的scaling laws，他们首先使用在不同下游任务上的negative log-likelihood作为validation loss，然后做了大量实验得到了以下结果，上左图的不同弧线代表不同固定的总FLOPs (budget)下，过模型的token量（训练token）不同得到的不同结果，上右图得到了最优模型的budget与训练token的关系，他们还预测了（利用之前大量的实验结果和一些旧模型）归一化的negative log-likelihood与预算和正确回答率的关系，下右图的关系是sigmoidal relation
+
+<p align = "center">
+<img src=/img/llama_3sl.png width="800" />
+<img src=/img/llama_3perfpred.png width="800" />
+</p>
+
 
 ## <span id="202502022356"> Mistral AI Models </span>
 - Mistral AI
