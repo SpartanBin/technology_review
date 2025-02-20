@@ -435,7 +435,7 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Llama 2使用提出了一个叫 Ghost Attention (GAtt)的方法，以用来让模型一直重点关注某些提示，比如扮演成某个名人等，他的做法没有看懂，似乎是不断简洁精炼这些重要的系统提示，然后再与后续的对话拼接在一起？
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
-- Llama 3论文做了比较详细的数据清洗和分类（详见原文），包括各种去重，基于模型的筛选，基于模型的专门从网页提取代码推理数据，基于模型的知识分类，基于scaling laws的最佳知识混合方法，最后得到的比例是50%的通用知识，25%的数学和推理，17%的代码和8%的多语言，以及使用了退火数据，就是在不同训练阶段使用了不同质量不同难度的数据，比如初期应该多用高质量低难度的数据
+- Llama 3论文做了比较详细的数据清洗和分类（详见原文），包括各种去重，基于模型的筛选，基于模型的专门从网页提取代码推理数据，基于模型的知识分类，基于scaling laws的最佳知识混合方法，最后得到的比例是50%的通用知识，25%的数学和推理，17%的代码和8%的多语言，以及使用了退火数据
 - Llama 3使用了传统transformer (dense transformer)架构，使用了GQA，使用了attention mask去遮罩同一个序列中来自不同文档的tokens，让他们不要互相关注，这个技术在长上下文里至关重要，因为在Llama 3中，对于405B的模型来说，在standard pre-training stage上下文是8k，在continued pre-training stage是128k，使用了RoPE
 
 <p align = "center">
@@ -449,6 +449,18 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 <img src=/img/llama_3perfpred.png width="800" />
 </p>
 
+- Llama 3用了tensor parallelism (TP), pipeline parallelism (PP), context parallelism (CP), data parallelism (DP)，达到了38-43%的显卡利用率，详见原文
+- Llama 3预训练有 (1) initial pre-training, (2) long-context pre-training, and (3) annealing 三个阶段，也用了余弦和warm up，阶段一上下文一开始是4k，一段时间后提升为8k，并且多次调整了数据混合比例，阶段2时他们经过了6次逐步增加上下文长度，最后才到128k，且每次他们都会等模型适应新长度才继续提升，在最后一个阶段，只剩最后少量训练token时，他们分别使用了一些各个领域极高质量的数据，并线性的将学习率降为0，在每个领域分别训练了一个模型，最后再将这些模型权重取平均值，得到最终模型
+
+<p align = "center">
+<img src=/img/llama_3posttraining.png width="800" />
+</p>
+
+- Llama 3 的 post-training （后训练）阶段有所不同，他们整个后训练也包含多种多样的数据意在提升模型的不同能力，整个后训练会循环6轮，每轮是先训练RM，然后由RM进行RS，然后用RS的最好结果来进行SFT，让你和再进行DPO
+- 后训练RM数据收集：他们会先让人类写少量示例，并让上一轮的多个模型（如果是第一轮就是预训练的超参数不同或不同数据混合的多个模型）针对同一个prompt做出多个回答，然后他让标注员选出最差的一个，并标出其他几个相比最差的一个好了多少，同时也允许标注员自己去写一个最好的答案，然后只保留最差的和比最差的好的回答，然后凑成对，把这些都拿去训练RM和过去每轮收集的数据都拿去训练RM，RM的loss和Llama 2一样，但是去掉了m(r)，因为他没有分级了
+- 后训练SFT：遵循RS，拿上一轮最好的模型生成多个回答，让RM选出最好的一个，然后需要对生成的答案做一些处理（详见原文），再结合一些人类示例数据和为了提升特定能力（比如调用工具）而制作的数据（详见原文，这里包含7种特殊数据，原文很详细），一起进行SFT
+- 后训练DPO：用本轮RM处新收集的模型产生的数据来进行DPO，在做DPO时会mask掉特殊头 (various special head)和结束token不让他们参与loss计算，不然模型会胡乱输出结束token，同时在DPO里要加入NLL loss (Negative Log Likelihood)（和InstructGPT一样），最后他们还是像预训练那样去合并多个模型的权重
+- Llama 3还尝试了多模态，包括图片和视频输入，以及语音转成文字输入，详见原文
 
 ## <span id="202502022356"> Mistral AI Models </span>
 - Mistral AI
