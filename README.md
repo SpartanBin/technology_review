@@ -172,6 +172,61 @@ def positional_encoding(seq_length, d_model):
 - OpenAI, 2021.2
 - Learning Transferable Visual Models From Natural Language Supervision
 
+<p align = "center">
+<img src=/img/clip_training.png width="1000" />
+</p>
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class ContrastiveLoss(nn.Module):
+    def __init__(self, initial_temperature, img_emb, text_emb, emb):
+        """
+        初始化对比学习损失函数。
+        参数：
+        - initial_temperature: 初始的 temperature 值
+        """
+        super(ContrastiveLoss, self).__init__()
+        # 定义 temperature 为可学习参数
+        self.temperature = nn.Parameter(torch.tensor(initial_temperature))
+        self.img_proj = nn.Linear(img_emb, emb, bias=False)
+        self.text_proj = nn.Linear(text_emb, emb, bias=False)
+
+    def forward(self, image_features, text_features):
+        """
+        计算对比学习损失。
+        参数：
+        - image_features: 图像特征张量，形状为 [batch_size, img_emb]
+        - text_features: 文本特征张量，形状为 [batch_size, text_emb]
+
+        返回：
+        - loss: 对比学习损失标量
+        """
+        # 确保特征已归一化
+        I_e = F.normalize(self.img_proj(image_features), p=2, dim=1)  # (batch_size, emb)
+        T_e = F.normalize(self.text_proj(text_features), p=2, dim=1)  # (batch_size, emb)
+
+        # 计算相似度矩阵
+        logits_for_img = (I_e @ T_e.T) / torch.exp(self.temperature)  # (batch_size, batch_size)
+        logits_for_text = logits_for_img.T
+
+        # 构造标签，在CLIP里image_features和text_features配对的样本是一一对应的
+        batch_size = image_features.size(0)
+        labels = torch.arange(batch_size)
+
+        # 计算交叉熵损失
+        loss_i = F.cross_entropy(logits_for_img, labels)
+        loss_t = F.cross_entropy(logits_for_text, labels)
+
+        # 返回平均损失
+        return (loss_i + loss_t) / 2
+```
+
+- CLIP使用的是对比学习方法，text encoder是GPT 2的架构，image encoder是ViT或者是ResNet的架构，训练使用的InfoNCE loss，因数据量够大，没有用预训练参数初始化两个encoder，是直接训练的，每次训练，都需要输入batch size对图像文本对，成对的就是正样本，其他batch size - 1个都是负样本，通过这种表示学习（对比学习）方法，相当于是把成对的向量距离拉近，不成对拉远
+- 右图表示如何inference，比如选择要做分类任务，有1000类，那就用一个固定的语句格式把这1000类变成1000个语句，带入text enc，得到1000个向量，然后图片过img enc得到一个向量，然后算距离，距离最近的类就是分类结果，CLIP的成就就是它解放了类别标签，由它训练出的分类器并不局限于固定数量的类别限制了
+
 ## <span id="202502021738"> Codex </span>
 - OpenAI, 2021.7
 - Evaluating Large Language Models Trained on Code
