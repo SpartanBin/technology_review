@@ -156,9 +156,23 @@ def positional_encoding(seq_length, d_model):
 - Google Research, Brain, 2020.10
 - An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale
 
+<p align = "center">
+<img src=/img/vit_backbone.png width="800" />
+</p>
+
+- 上图表达的十分清楚，就是将图像切成若干16 * 16大小的块，然后按顺序组成tokens序列，使用的位置编码是1D位置编码，是从线性变换之后插入的，使用的应该是原PE而不是bert那种可学习的（也尝试了可学习的和其他多种包括2D的，差别不大），其他设置几乎和bert相同，比如使用了类似的可学习的[CLS]用作输出编码，使用了标准的transformer encoder作为block
+
 ## <span id="202502021734"> MAE </span>
 - Facebook AI Research (FAIR), 2021.11
 - Masked Autoencoders Are Scalable Vision Learners
+
+<p align = "center">
+<img src=/img/mae_training.png width="800" />
+</p>
+
+- 是一种图像预训练方法，是标准的auto-encoder结构，预训练完decoder就不要了
+- mask是随机mask的，上图表达的十分清楚，mask的是像ViT那样的一块一块的，encoder是ViT，但是只接收没有mask的块，decoder就全部接收，decoder也是ViT，大小只有encoder的1/10
+- loss是MSE，且只计算mask位置的
 
 ## <span id="202502021735"> MoCo </span>
 - Facebook AI Research (FAIR), 2019.11
@@ -230,10 +244,19 @@ class ContrastiveLoss(nn.Module):
 ## <span id="202502021738"> Codex </span>
 - OpenAI, 2021.7
 - Evaluating Large Language Models Trained on Code
+- 这项技术最终变成了Github Copilot，论文里面只用了github python数据，但是Copilot可不止会写python
+- 微调自GPT 12B的模型
+- 高效实现了pass@k这种评价机制（详见原文），这种评价机制差不多就等于在给定多个候选解时，有多少概率至少有一个能通过所有测试
 
 ## <span id="202502021739"> AlphaCode </span>
 - DeepMind, 2022.2
 - Competition-Level Code Generation with AlphaCode
+- 用了多个主流编程语言的所有github公开库数据，预训练是在github数据上做的，还用了编程竞赛数据微调
+- 使用n@k评价机制，和Codex的pass@k是一样的
+- 将编程理解成sequence-to-sequence translation task，因此使用标准的完整transformer结构，但是使用了[multi-query attention](https://arxiv.org/abs/1911.02150)，就是q保持不变，所有k、v都共享参数，可见grouped-query attention (GQA)就是传统和这种方法的折衷方案
+- 预训练中有两个loss，用了bert的masked language modeling loss针对encoder，standard cross-entropy next-token prediction loss针对decoder，针对github文件随机采样一个位置，位置之前的作为encoder输入，之后的给decoder
+- 微调阶段和预训练loss基本一样，但是将decoder的loss改成了修改后的GOLD（详见原文），因为竞赛数据里包含多种解法，修改后的GOLD可以让模型只关注一种解法（模型已经拟合了的解法），不然模型会增加每一种解法的概率（可能反而会影响正确率？），只是这次是把竞赛的问题描述给encoder，代码给decoder，微调时也用了竞赛里面错误的问题提交，用了两种针对此的解决方案，第一种是在问题描述中加入此问题是否正确的描述，另一种是准备了一个小的transformer接收来自主模型的最后一层token表示去判断是正确还是错误（sampling阶段不用）
+- 在采样回答时也有多种特殊方法和处理（详见原文），比如使用了[nucleus sampling](https://arxiv.org/abs/1904.09751)（核采样，top-p采样），核采样不需要像beam search一样维持多个候选序列，核采样只有一个序列，采样方法是设置一个阈值p，按概率大小排列候选词，然后从大到小依次加这些概率，直到求和大小大于等于p截至，然后根据参与求和的这些词的概率（归一化后）采样出一个词，然后继续以上步骤，直到生成完整序列
 
 ## <span id="202502091904"> Scaling Laws </span>
 - OpenAI, 2020.1
