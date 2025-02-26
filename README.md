@@ -338,7 +338,7 @@ $$ L(C) \propto C^{-\gamma} $$
 
 <div align="center">
 
-$$ y = \frac{x - \mathcal{E}(x)}{\sqrt{\mathcal{Var}(x) + \epsilon} \gamma + \beta $$
+$$ y = \frac{x - \mathcal{E}(x)}{\sqrt{\mathcal{Var}(x) + \epsilon}} \gamma + \beta $$
 
 </div>
 
