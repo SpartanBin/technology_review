@@ -342,7 +342,8 @@ $$ y = \frac{x - \mathcal{E}(x)}{\sqrt{\mathcal{Var}(x) + \epsilon}} \gamma + \b
 
 </div>
 
-- T5在预训练阶段是像BERT那样mask tokens，但是他是mask完整的一段或多段tokens，而不是像BERT那样非连续的去一个一个地mask token，然后decoder的任务就是输出被mask掉的这些段落，在微调阶段就是标准的像原transformer那样的seq2seq训练，使用了teacher forcing和cross-entropy loss，seq2seq任务的decoder也是自回归的，也就是像LLM一样一个token一个token的往外吐，所以才有 'teacher forcing'
+- T5使用了teacher forcing和cross-entropy loss，在预训练阶段是像BERT那样mask tokens，但是他是mask完整的一段或多段tokens，而不是像BERT那样非连续的去一个一个地mask token，然后decoder的任务就是输出被mask掉的这些段落，在微调阶段就是标准的像原transformer那样的seq2seq训练
+- decoder的生成过程是自回归的，也就是像LLM一样一个token一个token的往外吐，所以才有 'teacher forcing'，所以T5不管是预训练还是finetune都是自回归的，但是BERT那样的encoder模型是一次性预测所有被遮掩的tokens，这值得注意
 
 ## <span id="202502021740"> GPT 1 2 3 </span>
 - OpenAI, 2018.6, 2019.2, 2020.5
