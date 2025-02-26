@@ -342,7 +342,7 @@ $$ y = \frac{x - \mathcal{E}(x)}{\sqrt{\mathcal{Var}(x) + \epsilon}} \gamma + \b
 
 </div>
 
-- T5的优化目标等价于LLM里常见的NLL，使用了teacher forcing和cross-entropy loss
+- T5使用了teacher forcing和cross-entropy loss
 - 他在预训练阶段是像BERT那样mask tokens，但是他是mask完整的一段或多段tokens，而不是像BERT那样非连续的去一个一个地mask token，然后decoder的任务就是输出被mask掉的这些段落，在微调阶段就是标准的像原transformer那样的seq2seq训练
 
 ## <span id="202502021740"> GPT 1 2 3 </span>
