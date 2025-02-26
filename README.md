@@ -329,6 +329,22 @@ $$ L(C) \propto C^{-\gamma} $$
 - Google, 2019.10
 - Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer
 
+<p align = "center">
+<img src=/img/T5_task.png width="800" />
+</p>
+
+- T5使用传统transformer encoder-decoder的架构，核心思想在于将所有自然语言处理任务都转化为“文本到文本”的格式，能够同时处理机器翻译、文本摘要、问答、情感分析等多种任务
+- 模型结构相比原transformer有微小区别，1.移除了原Layer Norm的偏置项，原Layer Norm实现参考torch，2.使用相对位置编码，每个可能的 key–query 位置差都对应一个单一的、可学习的标量，这个标量会被加到注意力计算中，所有层之间，这组相对位置参数是共享的，但在同一层中，不同注意力头各自拥有独立的相对位置偏置，限定了适用的最大相对距离，超出这一范围的所有位置使用相同的 Embedding
+
+<div align="center">
+
+$$ y = \frac{x - \mathcal{E}(x)}{\sqrt{\mathcal{Var}(x) + \epsilon} \gamma + \beta $$
+
+</div>
+
+- T5的优化目标等价于LLM里常见的NLL，使用了teacher forcing和cross-entropy loss
+- 他在预训练阶段是像BERT那样mask tokens，但是他是mask完整的一段或多段tokens，而不是像BERT那样非连续的去一个一个地mask token，然后decoder的任务就是输出被mask掉的这些段落，在微调阶段就是标准的像原transformer那样的seq2seq训练
+
 ## <span id="202502021740"> GPT 1 2 3 </span>
 - OpenAI, 2018.6, 2019.2, 2020.5
 - (GPT 1) Improving Language Understanding by Generative Pre-Training
@@ -439,7 +455,7 @@ $$ Item_3 = -\nabla_{\theta} \log \pi (y_l | x) $$
 - LLaMA: Open and Efficient Foundation Language Models
 - Llama 2: Open Foundation and Fine-Tuned Chat Models
 - The Llama 3 Herd of Models
-- LLaMA和GPT 3一样使用Pre-normalization，也就是normalize transformer block的input而不是output，使用的是[RMSNorm](https://arxiv.org/abs/1910.07467)，首先我们回忆一下为什么要用LayerNorm，[因为神经网络会遇到内部协方差偏移的问题，每层输入的分布会因为前一层网络的参数更新而变](https://arxiv.org/abs/1502.03167)，以下是LayerNorm的计算方式，a是输入，a bar是输出，i表示向量（张量）中的第i个数值，g是用来重新缩放数值的参数，被初始化为1，LayerNorm被认为有用的主要原因是其缩放不变性和中心化不变性
+- LLaMA和GPT 3一样使用Pre-normalization，也就是normalize transformer block的input而不是output，使用的是[RMSNorm](https://arxiv.org/abs/1910.07467)，首先我们回忆一下为什么要用LayerNorm，[因为神经网络会遇到内部协方差偏移的问题，每层输入的分布会因为前一层网络的参数更新而变](https://arxiv.org/abs/1502.03167)，以下是LayerNorm的计算方式（应该省略了偏置项），a是输入，a bar是输出，i表示向量（张量）中的第i个数值，g是用来重新缩放数值的参数，被初始化为1，LayerNorm被认为有用的主要原因是其缩放不变性和中心化不变性
 
 <div align="center">
 
