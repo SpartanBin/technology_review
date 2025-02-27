@@ -9,6 +9,7 @@
 - [CLIP (OpenAI, 2021.2)](#202502021737)
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
+- [MoE (Google Brain, 2017.1)](#202502050303)
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
 - [Chain-of-Thought (Google Research, Brain, 2022.1)](#202502191230)
 - [Toolformer (Meta AI Research, 2023.2)](#202502151904)
@@ -18,8 +19,7 @@
 - [Claude (Anthropic, 2022.4)](#202502021742)
 - [DPO (Stanford University, 2023.5)](#202502191442)
 - [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
-- [Mistral AI Models (Mistral AI, 2023.10)](#202502022356)
-- [MoE (Google Brain, 2017.1)](#202502050303)
+- [Mistral AI Models (Mistral AI, 2023.10, 2024.1)](#202502022356)
 - [Flamingo (DeepMind, 2022.4)](#202502151055)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
@@ -257,6 +257,19 @@ class ContrastiveLoss(nn.Module):
 - 预训练中有两个loss，用了bert的masked language modeling loss针对encoder，standard cross-entropy next-token prediction loss针对decoder，针对github文件随机采样一个位置，位置之前的作为encoder输入，之后的给decoder
 - 微调阶段和预训练loss基本一样，但是将decoder的loss改成了修改后的GOLD（详见原文），因为竞赛数据里包含多种解法，修改后的GOLD可以让模型只关注一种解法（模型已经拟合了的解法），不然模型会增加每一种解法的概率（可能反而会影响正确率？），只是这次是把竞赛的问题描述给encoder，代码给decoder，微调时也用了竞赛里面错误的问题提交，用了两种针对此的解决方案，第一种是在问题描述中加入此问题是否正确的描述，另一种是准备了一个小的transformer接收来自主模型的最后一层token表示去判断是正确还是错误（sampling阶段不用）
 - 在采样回答时也有多种特殊方法和处理（详见原文），比如使用了[nucleus sampling](https://arxiv.org/abs/1904.09751)（核采样，top-p采样），核采样不需要像beam search一样维持多个候选序列，核采样只有一个序列，采样方法是设置一个阈值p，按概率大小排列候选词，然后从大到小依次加这些概率，直到求和大小大于等于p截至，然后根据参与求和的这些词的概率（归一化后）采样出一个词，然后继续以上步骤，直到生成完整序列
+
+## <span id="202502050303"> MoE </span>
+- Google Brain, 2017.1
+- Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer
+
+<p align = "center">
+<img src=/img/moe_layer.png width="400" />
+</p>
+
+- 每一个MoE层由一个或两个(two-level hierarchical MoE)门控单元和多个专家n组成，门控单元会经过softmax输出n个概率，然后启用top k个专家，把他们的输出结果求和作为输出，在这篇论文中他们的专家用的LSTM，门控就是线性变换
+- 原文提到他们是用类似dropout的机制实现的只让k个专家参与运算，可以想象相当于是不参与的就都不进行forward，然后他们会让gradient backward回来直接训练门控单元，而不是像[这篇论文](https://arxiv.org/abs/1511.06297)一样使用强化学习(Reinforce)训练
+- 然后他们为了不让门控单元只去依赖某几个专家，他们用了Noisy Top-K Gating，就是增加了一个可学习的噪声参数，并让噪声与原门口输出相加，再代入softmax
+- 文章说就算有Noisy Top-K Gating还是会有部分专家被过度依赖，因此提出了一个loss，我看loss大致就是把选出来的top k个概率求和，这样梯度下降应该就可以缩小这些概率，达到增强探索的目地，他新增的loss里面还有一些CV之类的不知道是运算符号还是系数，就没有看懂了
 
 ## <span id="202502091904"> Scaling Laws </span>
 - OpenAI, 2020.1
@@ -557,9 +570,10 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Llama 3还尝试了多模态，包括图片和视频输入，以及语音转成文字输入，详见原文
 
 ## <span id="202502022356"> Mistral AI Models </span>
-- Mistral AI, 2023.10
-- Mistral 7B
+- Mistral AI, 2023.10, 2024.1
 - 是原LLaMA团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
+- Mistral 7B
+- Mixtral of Experts
 - Mistral 7B结构和LLaMA十分相似，在LLaMA基础上额外使用了GQA、SWA和Pre-fill and Chunking技术
 - [sliding window attention (SWA)](https://arxiv.org/abs/2004.05150)的每个token只关注其局部邻域内的一部分token，或是关注固定距离的一部分token，如下所示，在Mistral 7B里是只关注其局部邻域如图中2和下所示（下是Mistral 7B原文示意图），图下3是说经过多层堆叠，注意力影响还是可以蔓延开来
 
@@ -571,20 +585,12 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 
 - Pre-fill and Chunking是内存优化技术，Pre-fill比较常见，大部分LLM都会用，就是存kv cache，Chunking感觉应该是配合SWA使用的，因为SWA只需要邻域attention权重，所以可以对过长的prompt分块处理，分块加载入内存（显存）
 - 未解决的疑问：[NVIDIA TensorRT-LLM也有分块预填充功能](https://developer.nvidia.com/zh-cn/blog/streamlining-ai-inference-performance-and-deployment-with-nvidia-tensorrt-llm-chunked-prefill/?utm_source=chatgpt.com)，不知道如果没有SWA这个该怎么用？
-- 听说Mistral Large 2比Llama3.1擅长代码和数学
-
-## <span id="202502050303"> MoE </span>
-- Google Brain, 2017.1
-- Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer
 
 <p align = "center">
-<img src=/img/moe_layer.png width="400" />
+<img src=/img/mixtralofexperts_layer.png width="600" />
 </p>
 
-- 每一个MoE层由一个或两个(two-level hierarchical MoE)门控单元和多个专家n组成，门控单元会经过softmax输出n个概率，然后启用top k个专家，把他们的输出结果求和作为输出，在这篇论文中他们的专家用的LSTM，门控就是线性变换
-- 原文提到他们是用类似dropout的机制实现的只让k个专家参与运算，可以想象相当于是不参与的就都不进行forward，然后他们会让gradient backward回来直接训练门控单元，而不是像[这篇论文](https://arxiv.org/abs/1511.06297)一样使用强化学习(Reinforce)训练
-- 然后他们为了不让门控单元只去依赖某几个专家，他们用了Noisy Top-K Gating，就是增加了一个可学习的噪声参数，并让噪声与原门口输出相加，再代入softmax
-- 文章说就算有Noisy Top-K Gating还是会有部分专家被过度依赖，因此提出了一个loss，我看loss大致就是把选出来的top k个概率求和，这样梯度下降应该就可以缩小这些概率，达到增强探索的目地，他新增的loss里面还有一些CV之类的不知道是运算符号还是系数，就没有看懂了
+- 听说Mistral Large 2比Llama3.1擅长代码和数学
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
