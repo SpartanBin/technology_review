@@ -561,7 +561,7 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Mistral 7B
 - 是原LLaMA团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
 - Mistral 7B结构和LLaMA十分相似，在LLaMA基础上额外使用了GQA、SWA和Pre-fill and Chunking技术
-- Mistral 7B使用了GQA和[sliding window attention (SWA)](https://arxiv.org/abs/2004.05150)，SWA的每个token只关注其局部邻域内的一部分token，或是关注固定距离的一部分token，如下所示，在Mistral 7B里是只关注其局部邻域如图中2和下所示（下是Mistral 7B原文示意图），图下3是说经过多层堆叠，注意力影响还是可以蔓延开来
+- [sliding window attention (SWA)](https://arxiv.org/abs/2004.05150)的每个token只关注其局部邻域内的一部分token，或是关注固定距离的一部分token，如下所示，在Mistral 7B里是只关注其局部邻域如图中2和下所示（下是Mistral 7B原文示意图），图下3是说经过多层堆叠，注意力影响还是可以蔓延开来
 
 <p align = "center">
 <img src=/img/mistral7b_attweight1.png width="800" />
@@ -569,7 +569,7 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 <img src=/img/mistral7b_attweight3.png width="800" />
 </p>
 
-- Mistral 7B使用了Pre-fill and Chunking进行内存优化，Pre-fill比较常见，大部分LLM都会用，就是存kv cache，Chunking感觉应该是配合SWA使用的，因为SWA只需要邻域attention权重，所以可以对过长的prompt分块处理，分块加载入内存（显存）
+- Pre-fill and Chunking是内存优化技术，Pre-fill比较常见，大部分LLM都会用，就是存kv cache，Chunking感觉应该是配合SWA使用的，因为SWA只需要邻域attention权重，所以可以对过长的prompt分块处理，分块加载入内存（显存）
 - 未解决的疑问：[NVIDIA TensorRT-LLM也有分块预填充功能](https://developer.nvidia.com/zh-cn/blog/streamlining-ai-inference-performance-and-deployment-with-nvidia-tensorrt-llm-chunked-prefill/?utm_source=chatgpt.com)，不知道如果没有SWA这个该怎么用？
 - 听说Mistral Large 2比Llama3.1擅长代码和数学
 
