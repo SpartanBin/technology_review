@@ -587,8 +587,26 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - 未解决的疑问：[NVIDIA TensorRT-LLM也有分块预填充功能](https://developer.nvidia.com/zh-cn/blog/streamlining-ai-inference-performance-and-deployment-with-nvidia-tensorrt-llm-chunked-prefill/?utm_source=chatgpt.com)，不知道如果没有SWA这个该怎么用？
 
 <p align = "center">
-<img src=/img/mixtralofexperts_layer.png width="600" />
+<img src=/img/mixtralofexperts_layer.png width="500" />
+<img src=/img/mixtralofexperts_block.png width="700" />
 </p>
+
+- Mixtral of Experts和Mistral 7B基本一样，除了FFN都换成了MoE（上图中上面那张），结构比较类似于[Switch Transformers](https://arxiv.org/abs/2101.03961)（上图中下面那张），以下是公式，其中Top2就是Top K选择，SwiGLU_i就是专家，没被选择的那些专家不用参与运算，注意Mixtral of Experts就像Switch Transformers一样，针对每个token都有选择不同专家的过程
+
+<div align="center">
+
+$$ y = \sum_{i=0}^{n-1} Softmax[Top2(x \times W_g)] \times SwiGLU_i(x) $$
+
+</div>
+
+- 因为只选择Top K个专家，没被选择专家不运算，所以会中断从没选到的专家那里传来的梯度，之前有个误区就是以为这里会中断梯度回传到gate网络，实际不会，只让参与运算的专家回传即可，但是正是因为这个问题会导致MoE的训练不稳定（比如长期某个专家未被选到，突然被选到了）
+- Mixtral of Experts有一个疑点就是在训练阶段一般MoE都会去平衡对专家的选择，通常是添加Auxiliary Loss，Mixtral of Experts虽然没提，但是大概率是要添加的，添加该loss会产生新问题，比如在Switch Transformers中，loss如下，其中f表示每个专家实际被选中的token比例（离散计数不可微）P表示每个专家softmax后的概率之和（可微），这里在backward时就需要使用直通估计器 (Straight‑Through Estimator, STE)，做法就是将上一个倒数直接作为不能求导的环节的倒数，比如对于 ∂L/∂x=∂L/∂y⋅∂y/∂x，因为∂y/∂x不能求，所以直接将 ∂L/∂y 作为 ∂L/∂x 的估计，相当于是将f直接视为常数（例外GPT还提到了一种解决类似问题的方法叫Gumbel-Softmax，似乎在离散DDPG处看到过，之后看一看）
+
+<div align="center">
+
+$$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
+
+</div>
 
 - 听说Mistral Large 2比Llama3.1擅长代码和数学
 
