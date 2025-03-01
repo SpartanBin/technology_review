@@ -19,7 +19,7 @@
 - [Claude (Anthropic, 2022.4)](#202502021742)
 - [DPO (Stanford University, 2023.5)](#202502191442)
 - [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
-- [Mistral AI Models (Mistral AI, 2023.10, 2024.1)](#202502022356)
+- [Mistral AI Models (Mistral AI, 2023.10, 2024.1, 2024.10)](#202502022356)
 - [Flamingo (DeepMind, 2022.4)](#202502151055)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
@@ -570,10 +570,11 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 - Llama 3还尝试了多模态，包括图片和视频输入，以及语音转成文字输入，详见原文
 
 ## <span id="202502022356"> Mistral AI Models </span>
-- Mistral AI, 2023.10, 2024.1
-- 是原LLaMA团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)
+- Mistral AI, 2023.10, 2024.1, 2024.10
+- 是原LLaMA团队出来创业的成果，[是一系列模型](https://docs.mistral.ai/getting-started/models/models_overview/)，他有的模型没有在arxiv上写文章，只在官方新闻上说了一下，这种模型都没有讲结构，只讲了performance，估计这种和以前的结构一样，只是增大了参数量，换了数据和训练方法，这种以下没有列出来讲
 - Mistral 7B
 - Mixtral of Experts
+- Pixtral 12B
 - Mistral 7B结构和LLaMA十分相似，在LLaMA基础上额外使用了GQA、SWA和Pre-fill and Chunking技术
 - [sliding window attention (SWA)](https://arxiv.org/abs/2004.05150)的每个token只关注其局部邻域内的一部分token，或是关注固定距离的一部分token，如下所示，在Mistral 7B里是只关注其局部邻域如图中2和下所示（下是Mistral 7B原文示意图），图下3是说经过多层堆叠，注意力影响还是可以蔓延开来
 
@@ -608,7 +609,20 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 
 </div>
 
-- 听说Mistral Large 2比Llama3.1擅长代码和数学
+- 听说Mistral Large 2比Llama3.1擅长代码和数学，大小是123B
+- Pixtral 12B是一个多模态模型，可以接收多轮对话的文字和图片，可以处理128k上下文，是由预训练好的transformer encoder + transformer decoder微调而来，它由一个专门处理图像的encoder叫作Pixtral-ViT (400M)和一个表现最好的Mistral Nemo 12B （这个模型应该结构和Mistral 7B一样，但是训练的可以处理128k上下文）作为decoder组成
+
+<p align = "center">
+<img src=/img/pixtral12b_encoder.png width="800" />
+</p>
+
+- encoder需要被训练的可以适应不同的分辨率和长宽比，其结构源于ViT，只是做了4个改动，1.Break tokens，在图像换行处加入[IMAGE BREAK]，在图像结尾加入[IMAGE END]，2.FFN中加入GLUE家族激活函数，3.加入block-diagonal mask让不是一张图片的之间没有注意力权重，4.用了RoPE-2D，这是他们改进自RoPE的算法，旋转矩阵没有学好，详见原文，文章没有具体提是怎么预训练encoder的，但是引用了CLIP
+
+<p align = "center">
+<img src=/img/pixtral12b_decoder.png width="800" />
+</p>
+
+- 图中那个Vision-Language Projector是一个用了GeLU激活的两层fcn，用来统一dimension，在decoder中图像token也会被视为文字token，比如同样要使用1D的RoPE处理，文章也没有说encoder和decoder合并后，要怎么一起微调
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
