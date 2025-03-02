@@ -9,6 +9,7 @@
 - [CLIP (OpenAI, 2021.2)](#202502021737)
 - [Codex (OpenAI, 2021.7)](#202502021738)
 - [AlphaCode (DeepMind, 2022.2)](#202502021739)
+- [bfloat16 (Google Brain)](#202503021144)
 - [MoE (Google Brain, 2017.1)](#202502050303)
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
 - [Chain-of-Thought (Google Research, Brain, 2022.1)](#202502191230)
@@ -257,6 +258,17 @@ class ContrastiveLoss(nn.Module):
 - 预训练中有两个loss，用了bert的masked language modeling loss针对encoder，standard cross-entropy next-token prediction loss针对decoder，针对github文件随机采样一个位置，位置之前的作为encoder输入，之后的给decoder
 - 微调阶段和预训练loss基本一样，但是将decoder的loss改成了修改后的GOLD（详见原文），因为竞赛数据里包含多种解法，修改后的GOLD可以让模型只关注一种解法（模型已经拟合了的解法），不然模型会增加每一种解法的概率（可能反而会影响正确率？），只是这次是把竞赛的问题描述给encoder，代码给decoder，微调时也用了竞赛里面错误的问题提交，用了两种针对此的解决方案，第一种是在问题描述中加入此问题是否正确的描述，另一种是准备了一个小的transformer接收来自主模型的最后一层token表示去判断是正确还是错误（sampling阶段不用）
 - 在采样回答时也有多种特殊方法和处理（详见原文），比如使用了[nucleus sampling](https://arxiv.org/abs/1904.09751)（核采样，top-p采样），核采样不需要像beam search一样维持多个候选序列，核采样只有一个序列，采样方法是设置一个阈值p，按概率大小排列候选词，然后从大到小依次加这些概率，直到求和大小大于等于p截至，然后根据参与求和的这些词的概率（归一化后）采样出一个词，然后继续以上步骤，直到生成完整序列
+
+## <span id="202503021144"> bfloat16 </span>
+- Google Brain, [wiki](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format)
+
+<p align = "center">
+<img src=/img/bfloat16_1.png width="500" />
+<img src=/img/bfloat16_2.png width="800" />
+</p>
+
+- 现在训练模型基本都是用的bfloat16数据格式，torch.dtype是torch.bfloat16
+- 可以看到bfloat16实际就是改了原本的float16 指数和尾数的位宽，bfloat16的指数位宽和float32是一样的，那它的数值范围和float32也一样了，但是牺牲了精度
 
 ## <span id="202502050303"> MoE </span>
 - Google Brain, 2017.1
