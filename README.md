@@ -35,6 +35,7 @@
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
+- [QAT](#202503021530)
 
 ## <span id="202502021731"> Transformer </span>
 - Google Brain, Google Research, 2017.6
@@ -335,6 +336,7 @@ $$ W = W_0 + \frac{\alpha}{r} B A $$
 - 在推理时，可以先将lora与权重合并，这样就不需要做两次矩阵乘法了
 - GPT说lora通常只微调权重而不微调bias，在原文中对transformer的微调是只微调了attention中的线性变换，没有微调FFN中的
 - 在实际使用时（推理）可以再去调alpha，还可以多个lora一起使用（这点很反直觉，应该也没有什么理论依据，明明不是一起训练出来的，却可以一起用），只是多个一起使用需要更仔细地去调每个lora的alpha，平衡每个lora影响的强度
+- 后面还诞生了[QLoRA](https://arxiv.org/abs/2305.14314)，就是先对模型做低比特量化（比如4bit, 4-bit NormalFloat, NF4），完了再lora
 
 ## <span id="202502191230"> Chain-of-Thought </span>
 - Google Research, Brain, 2022.1
@@ -707,3 +709,9 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 ## <span id="202502021754"> HunyuanVideo </span>
 - Tencent Hunyuan, 2024.12
 - HunyuanVideo: A Systematic Framework For Large Video Generative Models
+
+## <span id="202503021530"> QAT </span>
+- [blog](https://pytorch.org/torchtune/main/tutorials/qat_finetune.html)
+- QAT是一种在模型训练过程中就考虑量化效应的方法，其主要思想在于让网络在训练时模拟低精度运算，从而提高量化后模型的性能
+- 在forward中就模拟量化（近似量化后的值），让网络在前向传播时体验低精度计算的影响
+- 在反向传播中近似梯度，由于量化操作通常是非可微的，所以可以用STE近似
