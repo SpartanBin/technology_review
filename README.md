@@ -12,6 +12,7 @@
 - [bfloat16 (Google Brain)](#202503021144)
 - [MoE (Google Brain, 2017.1)](#202502050303)
 - [Scaling Laws (OpenAI, 2020.1)](#202502091904)
+- [LoRA (Microsoft, 2021.6)](#202503021224)
 - [Chain-of-Thought (Google Research, Brain, 2022.1)](#202502191230)
 - [Toolformer (Meta AI Research, 2023.2)](#202502151904)
 - [T5 (Google, 2019.10)](#202502092120)
@@ -314,6 +315,26 @@ $$ L(C) \propto C^{-\gamma} $$
 - 简而言之，训练模型结果是可以预测的（利用结构相同但是规模较小的模型结果），计算量上升模型表现也会上升，但是边际效应递减，并不能无限增大
 - 当预算有限的情况下，增大模型参数数量比增大数据量更有效
 - 小模型相比大模型更容易过拟合，大模型泛化的潜力更强
+
+## <span id="202503021224"> LoRA </span>
+- Microsoft, 2021.6
+- LoRA: Low-Rank Adaptation of Large Language Models
+
+<p align = "center">
+<img src=/img/lora_training.png width="400" />
+</p>
+
+<div align="center">
+
+$$ W = W_0 + \frac{\alpha}{r} B A $$
+
+</div>
+
+- lora就是针对模型的每个权重矩阵学习其两个低秩分解矩阵 r << min(d, k) ，d、k是权重的两个维度，r是B、A的秩，这样需要学习的权重数量就显著下降了，而且也是全参数微调（注意全参微调一般指的就是直接微调所有权重，这里只是说lora也改变了所有参数的权重），lora的灵感来源于[文章1](https://arxiv.org/abs/1804.08838)和[文章2](https://arxiv.org/abs/2012.13255)，大意是说model adaptation learning实际上的参数变化是在一个内在的较低的维度上，所以lora才产生了学习两个低秩分解矩阵的想法
+- 上图是在训练期间lora的做法，可以看到和原权重的矩阵乘法是分离的，初始化时对矩阵B使用随机高斯初始化，A直接全部初始化为0，这样在一开始时，ΔW (BA)就是0，alpha人为设置的缩放因子，r是秩
+- 在推理时，可以先将lora与权重合并，这样就不需要做两次矩阵乘法了
+- GPT说lora通常只微调权重而不微调bias，在原文中对transformer的微调是只微调了attention中的线性变换，没有微调FFN中的
+- 在实际使用时（推理）可以再去调alpha，还可以多个lora一起使用（这点很反直觉，应该也没有什么理论依据，明明不是一起训练出来的，却可以一起用），只是多个一起使用需要更仔细地去调每个lora的alpha，平衡每个lora影响的强度
 
 ## <span id="202502191230"> Chain-of-Thought </span>
 - Google Research, Brain, 2022.1
