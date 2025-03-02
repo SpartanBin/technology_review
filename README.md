@@ -260,7 +260,7 @@ class ContrastiveLoss(nn.Module):
 - 在采样回答时也有多种特殊方法和处理（详见原文），比如使用了[nucleus sampling](https://arxiv.org/abs/1904.09751)（核采样，top-p采样），核采样不需要像beam search一样维持多个候选序列，核采样只有一个序列，采样方法是设置一个阈值p，按概率大小排列候选词，然后从大到小依次加这些概率，直到求和大小大于等于p截至，然后根据参与求和的这些词的概率（归一化后）采样出一个词，然后继续以上步骤，直到生成完整序列
 
 ## <span id="202503021144"> bfloat16 </span>
-- Google Brain, [wiki](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format)
+- Google Brain, brain floating point, [wiki](https://en.wikipedia.org/wiki/Bfloat16_floating-point_format)
 
 <p align = "center">
 <img src=/img/bfloat16_1.png width="500" />
