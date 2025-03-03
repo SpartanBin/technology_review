@@ -35,6 +35,7 @@
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
+- [Stanford Town (Stanford University, 2023.4)](#202503021548)
 - [QAT](#202503021530)
 
 ## <span id="202502021731"> Transformer </span>
@@ -709,6 +710,21 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 ## <span id="202502021754"> HunyuanVideo </span>
 - Tencent Hunyuan, 2024.12
 - HunyuanVideo: A Systematic Framework For Large Video Generative Models
+
+## <span id="202503021548"> Stanford Town </span>
+- Stanford University, 2023.4
+- Generative Agents: Interactive Simulacra of Human Behavior
+
+<p align = "center">
+<img src=/img/stanfordtown.png width="1000" />
+</p>
+
+- 这篇文章是做了一个实验，用LLM接入一个小社会（沙盒仿真游戏，像模拟人生那样），操作里面的人的一切行为，希望能模拟出可信的人类行为，这是一个很早期的实验，那个时候还没有LLM agent，所以整个实验结论还是令人惊喜的，且个人认为整个项目可以作为创造模拟游戏的一个很好的借鉴
+- [项目地址](https://github.com/joonspk-research/generative_agents)
+- 整个实验生成了一个可交互的沙盒环境（使用[Phaser web game development framework](https://phaser.io/)），比如里面的咖啡机可以煮咖啡，床可以睡人，没有理解具体是如何将大语言模型生成的动作描述和环境里的具体指令结合起来的，可能是字段匹配，如果是字段匹配，可能就难以用于更复杂的仿真了，个人感觉是不是可以像toolformer那样教LLM用些特殊指令执行动作，或者是在prompt里面预先规定好很多特殊字符用于执行，或者是直接训练LLM agent
+- LLM需要给出动作指令描述，比如为客户煮咖啡，或者是去公园散步，或者是与某人聊天，聊天需要额外开启一个会话窗口，就像平时人与LLM聊天那样聊，做其他动作的话需要LLM分步骤生成做的详细内容（当然也是额外会话，不会作为action影响沙盒，相当于就是比如你要写书，具体是什么内容，一步一步分别要写什么，慢慢细化），环境会总结人物目之所及的状态信息，并作为prompt给LLM
+- 建立了一个数据库作为人物的记忆流，由LLM为记忆打分，比如分手这种记忆应该给最高分，日常生活流水账低分，同时需要有一个额外的模型抽取这些记忆的embedding，并在人物要执行动作时与当前行为对话等算余弦相似度，抽取相关的记忆作为prompt，这显然是为了应付短的上下文能力，所以或许之后兴起的LLM知识库技术也是借鉴了该论文
+- 当记忆分数之和高于阈值时，会让LLM反思这些记忆，并总结抽象出更高级的记忆（我觉得这是一个很好的想法，可以用来定期总结并缩短记忆，有时候缩短记忆并不只是因为模型上下文长度限制，也是因为需要储存过长的kv cache，和需要kv做矩阵乘法），每次LLM生成动作时是给出一个plan，按plan依次执行，这是为了保证前后的一致性，避免LLM在一中午的时间里去吃三次饭（这值得注意，比如要建立一个与文章相似的仿真游戏，可能也会遇到前后动作一致性的问题，或许也要用到plan的方式，还是说在prompt里做一些额外的提示，比如：“刚刚吃过饭后，你现在决定要去干什么”）
 
 ## <span id="202503021530"> QAT </span>
 - [blog](https://pytorch.org/torchtune/main/tutorials/qat_finetune.html)
