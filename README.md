@@ -25,7 +25,6 @@
 - [Flamingo (DeepMind, 2022.4)](#202502151055)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
-- [DALL-E 1 2 3 (OpenAI)](#202502021745)
 - [AlphaFold 1 2 3 (DeepMind)](#202502021746)
 - [ViLT (Korea NAVER AI, 2021.2)](#202502021747)
 - [ALBEF (Salesforce Research, 2021.7)](#202502021748)
@@ -34,6 +33,7 @@
 - [CoCa (Google Research, 2022.5)](#202502021751)
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
 - [U-Net (University of Freiburg, Germany, 2015.5)](#202503051357)
+- [DALL-E 1 2 3 (OpenAI)](#202502021745)
 - [Stable Diffusion (CompVis, Runway ML, 2021.12)](#202503051346)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
@@ -675,9 +675,6 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - Noise2Music: Text-conditioned Music Generation with Diffusion Models
 - [paper](https://arxiv.org/abs/2302.03917)，[blog](https://google-research.github.io/noise2music/)
 
-## <span id="202502021745"> DALL-E 1 2 3 </span>
-- OpenAI
-
 ## <span id="202502021746"> AlphaFold 1 2 3 </span>
 - DeepMind
 
@@ -718,6 +715,9 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - 解码器中每个块上采样完之后，会与编码器中对应的块的卷积结果（先裁剪4边到适合解码器的尺寸(crop)）concatenate到一起，这样做论文说是为了加强高分辨率细节
 - 看上图1可以看出最后输出比输入的长宽小，所以论文利用overlap tile就是把分割图像先分割成重叠的若干份，最后再拼接起来，如果是边界位置就用镜像扩展，这样保证了与label的对应关系（因为label与输入尺寸一样）
 - 训练的时候加了个weight map，用来提到细胞间分界线这些像素在loss里面的权重，用来让模型更关注细胞边界
+
+## <span id="202502021745"> DALL-E 1 2 3 </span>
+- OpenAI
 
 ## <span id="202503051346"> Stable Diffusion </span>
 - CompVis, Runway ML, 2021.12
