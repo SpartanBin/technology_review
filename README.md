@@ -33,6 +33,8 @@
 - [BLIP (Salesforce Research, 2022.1)](#202502021750)
 - [CoCa (Google Research, 2022.5)](#202502021751)
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
+- [U-Net (University of Freiburg, Germany, 2015.5)](#202503051357)
+- [Stable Diffusion (CompVis, Runway ML, 2021.12)](#202503051346)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
 - [Stanford Town (Stanford University, 2023.4)](#202503021548)
@@ -702,6 +704,24 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 ## <span id="202502021752"> BEiT-3 </span>
 - Microsoft Corporation, 2022.8
 - Image as a Foreign Language: BEiT Pretraining for All Vision and Vision-Language Tasks
+
+## <span id="202503051357"> U-Net </span>
+- University of Freiburg, Germany, 2015.5
+- U-Net: Convolutional Networks for Biomedical Image Segmentation
+
+<p align = "center">
+<img src=/img/unet_backborn.png width="1000" />
+<img src=/img/unet_overlaptile.png width="1000" />
+</p>
+
+- 上图都画得很清楚，模型有编码器(Contracting Path)和解码器(Expansive Path)组成，最后输出层是(1, 1)卷积，全模型没使用linear transformation，编码器的每个块由2个(3, 3)的卷积（无padding和stride）和一个(2, 2)的max pooling组成，解码器的每个块由1个(2, 2)的反卷积（上采样）和2个(3, 3)的卷积（无padding和stride）组成，另外因为是用来做医学图像分割，所以最后输出的通道是2（2分类任务）
+- 解码器中每个块上采样完之后，会与编码器中对应的块的卷积结果（先裁剪4边到适合解码器的尺寸(crop)）concatenate到一起，这样做论文说是为了加强高分辨率细节
+- 看上图1可以看出最后输出比输入的长宽小，所以论文利用overlap tile就是把分割图像先分割成重叠的若干份，最后再拼接起来，如果是边界位置就用镜像扩展，这样保证了与label的对应关系（因为label与输入尺寸一样）
+- 训练的时候加了个weight map，用来提到细胞间分界线这些像素在loss里面的权重，用来让模型更关注细胞边界
+
+## <span id="202503051346"> Stable Diffusion </span>
+- CompVis, Runway ML, 2021.12
+- High-Resolution Image Synthesis with Latent Diffusion Models
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
