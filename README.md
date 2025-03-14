@@ -725,7 +725,7 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - DeepMind, 2017.11
 - Neural Discrete Representation Learning
 - 先回忆一下VAE，VAE (Variational Autoencoder) 是一种生成模型，目标是学习数据的潜在分布，从而生成与训练数据相似的新样本，与传统自编码器不同，VAE 不仅学习如何重构输入数据，还通过概率建模得到数据生成的隐变量分布，整个模型由编码器和解码器组成，编码器(Encoder)将输入数据映射到隐变量空间，并输出隐变量的分布参数（通常假设为高斯分布），即均值 μ 和对数方差 log(σ²)（σ是标准差），解码器(Decoder)从隐变量中采样，再将样本映射回数据空间，重构出与原始数据尽量相似的结果
-- VAE假设数据x是由隐变量z生成的，即存在生成过程p(x∣z)以及先验分布p(z)（通常假设为标准正态分布），由于直接求解后验分布p(z∣x)通常是不可行的，VAE 用一个近似分布q(z∣x)（由编码器输出）来替代，我们可以用下界ELBO (Evidence lower bound)作为优化目标（式1），需要最大化ELBO，因该形式不易最大化，替换为以下等价形式（式2），其中第一项为重构项，第二项为KL 散度，保证编码器输出的隐变量分布尽量接近先验分布p(z)，由于直接从q(z∣x)中采样会阻断梯度的传递，因此使用重参数化技巧模拟采样：编码器输出均值μ(x)和对数方差log(σ²(x))，标准差σ(x) = exp(log(σ²(x)) / 2)，生成一个标准正态分布噪声 𝜖 ∼ N(0,I)，最终z = μ(x) + σ(x) * 𝜖 ，实际损失函数：实际中将 -ELBO 作为损失函数，因此需要最小化重构损失，最大化KL，重构损失常用MSE（过去用BCE (binary cross entropy)），对于高斯分布 q(z∣x) = N(μ, σ²) 和先验分布 p(z) = N(0, I)，KL 散度有解析解（式3），其中d是z的维度，下面是GPT实现的VAE的实现（用的BCE）
+- VAE假设数据x是由隐变量z生成的，即存在生成过程p(x∣z)以及先验分布p(z)（通常假设为标准正态分布），由于直接求解后验分布p(z∣x)通常是不可行的，VAE 用一个近似分布q(z∣x)（由编码器输出）来替代，我们可以用下界ELBO (Evidence lower bound)作为优化目标（式1），需要最大化ELBO，因该形式不易最大化，替换为以下等价形式（式2），其中第一项为重构项，第二项为KL 散度，保证编码器输出的隐变量分布尽量接近先验分布p(z)，由于直接从q(z∣x)中采样会阻断梯度的传递，因此使用重参数化技巧模拟采样：编码器输出均值μ(x)和对数方差log(σ²(x))，标准差σ(x) = exp(log(σ²(x)) / 2)，生成一个标准正态分布噪声 𝜖 ∼ N(0,I)，最终z = μ(x) + σ(x) * 𝜖 ，实际损失函数：实际中将 -ELBO 作为损失函数，因此需要最小化重构损失，最大化KL，重构损失常用MSE（过去的二值图像用BCE (binary cross entropy)），对于高斯分布 q(z∣x) = N(μ, σ²) 和先验分布 p(z) = N(0, I)，KL 散度有解析解（式3），其中d是z的维度，下面是GPT实现的VAE的实现（用的BCE）
 
 <div align="center">
 
@@ -795,6 +795,15 @@ def loss_function(recon_x, x, mu, logvar):
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
 ```
+
+- VAE存在后验坍塌 (posterior collapse) 的问题，也就是过于强大编码器会忽略先验信息 (z) ，为了解决这个问题，VQ‑VAE (Vector Quantized Variational AutoEncoder) 将VAE和 VQ (Vector Quantization)相结合，因此 VQ‑VAE 包含编码器、离散隐变量表 (Codebook) 和解码器三个主要部分，在VAE中先验分布和后验分布都被假设为高斯分布，在VQ‑VAE都是离散分布且是被学习出来的
+- Codebook有随机初始化的k个向量，编码器的输出通过算欧式距离，取最近的离散向量替换作为解码器的输入，因为这里没有梯度回传，所以使用STE，loss由重建损失，Codebook对齐损失和 commitment loss三项组成，其中beta是设置的系数，sg表示梯度停止，z_q(x)就是被选出的e（离散变量），|| ||_2表示L2范数，第一项即重建损失（同VAE），第二项是因为STE不会让梯度流向e，所以加入使得e能与z尽量靠近，第三项是因为当e没有z学习速度快时会导致其无限增长，所以限制z与e数值接近
+
+<div align="center">
+
+$$ L = log \big[ p[x|z_q(x)] \big] + || sg[z_e(x)] - e ||_2 + \beta || z_e(x) - sg(e) ||_2 $$
+
+</div>
 
 ## <span id="202503071100"> VQ-GAN </span>
 - CompVis, 2020.12
