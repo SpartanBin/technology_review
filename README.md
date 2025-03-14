@@ -817,7 +817,7 @@ $$ L = log \big[ p[x|z_q(x)] \big] + || sg[z_e(x)] - e ||_2 + \beta || z_e(x) - 
 <img src=/img/vqgan_entirety.png width="800" />
 </p>
 
-- 用VQ-GAN来代指这篇论文肯定是不对的，不过VQ-GAN是这篇论文提出的方法之一，这篇论文的方法主要由VQ-GAN和transformer组成
+- 用VQ-GAN来代指这篇论文肯定是不对的，不过VQ-GAN是这篇论文提出的最重要方法，另外一部分是transformer
 - VQ-GAN原文写的有点晦涩难懂，不过他基本上改进自VQ-VAE，首先将原本的encoder、codebook、decoder作为了generator，里有一个patch-based discriminator，在loss上首先将VQ-VAE的重建loss改成了感知损失（perceptual loss，以下用L_rec指代），VQ-VAE loss的其他部分保持不变（以下L_VQ代指这个VQ-VAE loss改），感知损失就是找一个训练好的预训练模型，通常用VGG，然后把你生成的x和原x带入该模型，将该模型的所有中间层输出拿出来，算他们的L2距离，然后加权求和（权重自拟），另有一个判别器loss就是常见的2分类loss，以L_GAN指代，以下是生成器的loss，那个grad G_L指的是选中的生成器的层的对应损失的梯度，通常选输出层，delta是个极小值
 
 <div align="center">
@@ -826,6 +826,8 @@ $$ L = L_{VQ} + \lambda L_{GAN} $$
 $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 
 </div>
+
+- transformer就是在encoder和codebook编码完后，像GPT一样用transformer decoder only的形式进行next token的预测学习，在学习时可以学习带条件 (conditional) 和不带的情况 (unconditional) 
 
 ## <span id="202503051346"> Stable Diffusion </span>
 - CompVis, Runway ML, 2021.12
