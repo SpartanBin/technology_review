@@ -822,7 +822,7 @@ $$ L = log \big[ p[x|z_q(x)] \big] + || sg[z_e(x)] - e ||_2 + \beta || z_e(x) - 
 
 <div align="center">
 
-$$ L = L_VQ + \lambda L_GAN $$
+$$ L = L_{VQ} + \lambda L_{GAN} $$
 $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 
 </div>
