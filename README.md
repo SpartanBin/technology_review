@@ -34,6 +34,7 @@
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
 - [DALL-E 1 2 3 (OpenAI)](#202502021745)
 - [U-Net (University of Freiburg, Germany, 2015.5)](#202503051357)
+- [VQ-VAE (DeepMind, 2017.11)](#202503131226)
 - [VQ-GAN (CompVis, 2020.12)](#202503071100)
 - [Stable Diffusion (CompVis, Runway ML, 2021.12)](#202503051346)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
@@ -719,6 +720,81 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - 解码器中每个块上采样完之后，会与编码器中对应的块的卷积结果（先裁剪4边到适合解码器的尺寸(crop)）concatenate到一起，这样做论文说是为了加强高分辨率细节
 - 看上图1可以看出最后输出比输入的长宽小，所以论文利用overlap tile就是把分割图像先分割成重叠的若干份，最后再拼接起来，如果是边界位置就用镜像扩展，这样保证了与label的对应关系（因为label与输入尺寸一样）
 - 训练的时候加了个weight map（详见原文），用来提到细胞间分界线这些像素在loss里面的权重，用来让模型更关注细胞边界
+
+## <span id="202503131226"> VQ-VAE </span>
+- DeepMind, 2017.11
+- Neural Discrete Representation Learning
+- 先回忆一下VAE，VAE (Variational Autoencoder) 是一种生成模型，目标是学习数据的潜在分布，从而生成与训练数据相似的新样本，与传统自编码器不同，VAE 不仅学习如何重构输入数据，还通过概率建模得到数据生成的隐变量分布，整个模型由编码器和解码器组成，编码器(Encoder)将输入数据映射到隐变量空间，并输出隐变量的分布参数（通常假设为高斯分布），即均值 μ 和对数方差 log(σ²)（σ是标准差），解码器(Decoder)从隐变量中采样，再将样本映射回数据空间，重构出与原始数据尽量相似的结果
+- VAE假设数据x是由隐变量z生成的，即存在生成过程p(x∣z)以及先验分布p(z)（通常假设为标准正态分布），由于直接求解后验分布p(z∣x)通常是不可行的，VAE 用一个近似分布q(z∣x)（由编码器输出）来替代，我们可以用下界ELBO (Evidence lower bound)作为优化目标（式1），需要最大化ELBO，因该形式不易最大化，替换为以下等价形式（式2），其中第一项为重构项，第二项为KL 散度，保证编码器输出的隐变量分布尽量接近先验分布p(z)，由于直接从q(z∣x)中采样会阻断梯度的传递，因此使用重参数化技巧模拟采样：编码器输出均值μ(x)和对数方差log(σ²(x))，标准差σ(x) = exp(log(σ²(x)) / 2)，生成一个标准正态分布噪声 𝜖 ∼ N(0,I)，最终z = μ(x) + σ(x) * 𝜖 ，实际损失函数：实际中将 -ELBO 作为损失函数，因此需要最小化重构损失，最大化KL，重构损失常用MSE（过去用BCE (binary cross entropy)），对于高斯分布 q(z∣x) = N(μ, σ²) 和先验分布 p(z) = N(0, I)，KL 散度有解析解（式3），其中d是z的维度，下面是GPT实现的VAE的实现（用的BCE）
+
+<div align="center">
+
+$$ ELBO = ln[p(x)] - D_{KL}(q(z|x) || p(z|x)) $$
+$$ ELBO = E_{z \sim q(z|x)}\big[ln[p(x|z)]\big] - D_{KL}(q(z|x) || p(z)) $$
+$$ KL = - \frac{1}{2} \sum_{i=1}^{d} [1 + ln(\sigma_i^2) - \mu_i^2 - \sigma_i^2] $$
+
+</div>
+
+```python
+import torch.nn as nn
+
+# 定义 VAE 模型
+class VAE(nn.Module):
+    def __init__(self, input_dim=784, hidden_dim=400, latent_dim=20):
+        super(VAE, self).__init__()
+        # 编码器：输入 -> 隐藏层
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        # 分支输出潜在变量的均值和对数方差
+        self.fc21 = nn.Linear(hidden_dim, latent_dim)  # 均值 μ
+        self.fc22 = nn.Linear(hidden_dim, latent_dim)  # 对数方差 log(σ^2)
+
+        # 解码器：潜在变量 -> 隐藏层 -> 重构图像
+        self.fc3 = nn.Linear(latent_dim, hidden_dim)
+        self.fc4 = nn.Linear(hidden_dim, input_dim)
+
+        self.relu = nn.ReLU()
+
+    def encode(self, x):
+        """
+        编码过程：将输入数据映射到潜在空间，输出均值和对数方差
+        """
+        h1 = self.relu(self.fc1(x))
+        return self.fc21(h1), self.fc22(h1)
+
+    def reparameterize(self, mu, logvar):
+        """
+        重参数化技巧：通过均值和对数方差采样潜在向量
+        """
+        std = torch.exp(0.5 * logvar)   # 计算标准差
+        eps = torch.randn_like(std)     # 生成与 std 同形状的正态分布噪声
+        return mu + eps * std           # 返回采样结果
+
+    def decode(self, z):
+        """
+        解码过程：将潜在向量映射回原始数据空间
+        """
+        h3 = self.relu(self.fc3(z))
+        return torch.sigmoid(self.fc4(h3))  # 输出采用 Sigmoid 激活，保证值在 0~1 范围内
+
+    def forward(self, x):
+        """
+        前向传播过程：包含编码、重参数化和解码三个步骤
+        """
+        mu, logvar = self.encode(x.view(-1, 784))  # 将图片展平为一维向量
+        z = self.reparameterize(mu, logvar)
+        recon_x = self.decode(z)
+        return recon_x, mu, logvar
+
+def loss_function(recon_x, x, mu, logvar):
+    """
+    定义 VAE 的损失函数：
+    1. 重构损失：使用二值交叉熵衡量重构图像和原图像的差异
+    2. KL 散度：衡量编码器输出的潜在分布与标准正态分布之间的差异
+    """
+    BCE = nn.functional.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return BCE + KLD
+```
 
 ## <span id="202503071100"> VQ-GAN </span>
 - CompVis, 2020.12
