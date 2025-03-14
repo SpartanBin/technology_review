@@ -797,7 +797,7 @@ def loss_function(recon_x, x, mu, logvar):
 ```
 
 - VAE存在后验坍塌 (posterior collapse) 的问题，也就是过于强大编码器会忽略先验信息 (z) ，为了解决这个问题，VQ‑VAE (Vector Quantized Variational AutoEncoder) 将VAE和 VQ (Vector Quantization)相结合，因此 VQ‑VAE 包含编码器、离散隐变量表 (Codebook) 和解码器三个主要部分，在VAE中先验分布和后验分布都被假设为高斯分布，在VQ‑VAE都是离散分布且是被学习出来的
-- Codebook有随机初始化的k个向量，编码器的输出通过算欧式距离，取最近的离散向量替换作为解码器的输入，因为这里没有梯度回传，所以使用STE，loss由重建损失，Codebook对齐损失和 commitment loss三项组成，其中beta是设置的系数，sg表示梯度停止，z_q(x)就是被选出的e（离散变量），|| ||_2表示L2范数，第一项即重建损失（同VAE），第二项是因为STE不会让梯度流向e，所以加入使得e能与z尽量靠近，第三项是因为当e没有z学习速度快时会导致其无限增长，所以限制z与e数值接近
+- Codebook有随机初始化的k个向量，编码器的输出通过算欧式距离，取最近的离散向量替换作为解码器的输入，因为这里没有梯度回传，所以使用STE，loss由重建损失，Codebook对齐损失和 commitment loss三项组成，其中beta是设置的系数，sg表示梯度停止，z_q(x)就是被选出的e（离散变量），|| ||_2表示L2范数，第一项即重建损失（同VAE），第二项是因为STE不会让梯度流向e，所以加入使得e能够学习并与z尽量靠近，第三项是因为当e没有z学习速度快时会导致其无限增长，所以限制z与e数值接近
 
 <div align="center">
 
