@@ -32,11 +32,11 @@
 - [BLIP (Salesforce Research, 2022.1)](#202502021750)
 - [CoCa (Google Research, 2022.5)](#202502021751)
 - [BEiT-3 (Microsoft Corporation, 2022.8)](#202502021752)
-- [DALL-E 1 2 3 (OpenAI)](#202502021745)
+- [DALL-E 1 2 3 (OpenAI, 2021.2, 2022.4, 2023.8)](#202502021745)
 - [U-Net (University of Freiburg, Germany, 2015.5)](#202503051357)
 - [VQ-VAE (DeepMind, 2017.11)](#202503131226)
 - [VQ-GAN (CompVis, 2020.12)](#202503071100)
-- [Stable Diffusion (CompVis, Runway ML, 2021.12)](#202503051346)
+- [Stable Diffusion 1, SDXL, SD 3 (CompVis, Runway ML, Stability AI, 2021.12, 2023.7, 2024.3)](#202503051346)
 - [Movie Gen (Meta, 2024.10)](#202502021753)
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
 - [Stanford Town (Stanford University, 2023.4)](#202503021548)
@@ -705,7 +705,10 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - Image as a Foreign Language: BEiT Pretraining for All Vision and Vision-Language Tasks
 
 ## <span id="202502021745"> DALL-E 1 2 3 </span>
-- OpenAI
+- OpenAI, 2021.2, 2022.4, 2023.8
+- Zero-Shot Text-to-Image Generation
+- Hierarchical Text-Conditional Image Generation with CLIP Latents
+- [Improving Image Generation with Better Captions](https://cdn.openai.com/papers/dall-e-3.pdf)
 
 ## <span id="202503051357"> U-Net </span>
 - University of Freiburg, Germany, 2015.5
@@ -829,9 +832,11 @@ $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 
 - transformer就是在encoder和codebook编码完后，像GPT一样用transformer decoder only的形式进行next token的预测学习，在学习时可以学习带条件 (conditional) 和不带的情况 (unconditional) 
 
-## <span id="202503051346"> Stable Diffusion </span>
-- CompVis, Runway ML, 2021.12
+## <span id="202503051346"> Stable Diffusion 1, SDXL, SD 3 </span>
+- CompVis, Runway ML, Stability AI, 2021.12, 2023.7, 2024.3
 - High-Resolution Image Synthesis with Latent Diffusion Models
+- SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis
+- Scaling Rectified Flow Transformers for High-Resolution Image Synthesis
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
