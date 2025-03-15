@@ -838,7 +838,7 @@ $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 - SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis
 - Scaling Rectified Flow Transformers for High-Resolution Image Synthesis
 - SD 1和VQ-GAN + transformer的结构可以说差不多，可以说就是对VQ-GAN做了小修改，并且把transformer的predict next token换成了U-Net diffusion
-- SD 1对VQ-GAN的小修改就是增强其avoid arbitrarily scaled latent spaces的能力（VQ-VAE loss第三项就是在做这件事），有两种方法解决这个，只选其中一种，1.增加VAE loss中的KL divergence项（使用极小的权重10^(−6)），2.增大codebook的dimension
+- SD 1对VQ-GAN的小修改就是增强其avoid arbitrarily scaled latent spaces的能力（VQ-VAE loss第三项就是在做这件事），有两种方法解决这个，只选其中一种，1.增加VAE loss中的KL divergence项（使用极小的权重，原文是10^(−6)），2.增大codebook的dimension
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
