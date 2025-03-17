@@ -850,7 +850,15 @@ $$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
 
 </div>
 
-- 
+- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音是否就是正向扩散中从标准正态分布采样的噪声I？），以下式1和式2都是训练的loss，式2是由x0经过采样直接得到，实际中用式2，式3是生成过程中用来算均值的
+
+<div align="center">
+
+$$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t, t) ||^2 \big] $$
+$$ L = \frac{1 - \overline{\alpha}_t}{\overline{\alpha}_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
+$$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
+
+</div>
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
