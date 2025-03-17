@@ -839,6 +839,18 @@ $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 - Scaling Rectified Flow Transformers for High-Resolution Image Synthesis
 - SD 1和VQ-GAN + transformer的结构可以说差不多，可以说就是对VQ-GAN做了小修改，并且把transformer的predict next token换成了U-Net diffusion
 - SD 1对VQ-GAN的小修改就是增强其avoid arbitrarily scaled latent spaces的能力（VQ-VAE loss第三项就是在做这件事），有两种方法解决这个，只选其中一种，1.增加VAE loss中的KL divergence项（使用极小的权重，原文是10^(−6)），2.增大codebook的dimension
+- SD 1的Latent Diffusion Models就是[DDPM (Denoising Diffusion Probabilistic Models)](https://arxiv.org/abs/2006.11239)，2020年发表的DDPM被认为是带火扩散模型的关键，DDPM的建模过程有两个阶段，一个是正向扩散，另一个是逆向生成，两个阶段都是马尔可夫链
+- DDPM正向扩散从原始图像x0开始，每一步都向图像中添加少量高斯噪声，得到x1, ...xT，当T足够大时xT将接近于标准正态分布，即纯噪声，式1是单步过程，式2是从x0直接采样，注意该过程并不是生成噪声beta_t并加到原图像（噪声图像）上，而是根据经过beta_t缩放的原图像和一个根据beta_t和标准正态分布采样出的噪声I得到的一个高斯分布，在从里面采样直接得到下一步噪声图像，而且beta_t是一个根据步数变化的数值（就像学习率一样），所以beta_t如何调度会明显影响收敛速度质量，原DDPM和SD 1都是线性变化的，但是后续研究证明线性调度会导致还是清晰图像时信息丢失太快，如果使用开头慢中间快结尾慢的形式，会对质量有较大影响，比如OpenAI的[Improved DDPM](https://arxiv.org/abs/2102.09672)就是使用了余弦调度，显著提升了效果，后续主流的一些图像生成的调度方式都不太一样（截止到2025.3），不过总的来说都是用的余弦相关，且需要精心设计
+
+<div align="center">
+
+$$ q(x_t | x_{t-1}) = N(x_t; \sqrt{1 - \beta_t} x_{t-1}, \beta_t I) $$
+$$ q(x_t | x_0) = N \big( x_t; \sqrt{\overline{\alpha}_t} x_0, (1 - \overline{\alpha}_t) I \big) $$
+$$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
+
+</div>
+
+- 
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
