@@ -850,14 +850,14 @@ $$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
 
 </div>
 
-- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音就是正向扩散中从标准正态分布采样的噪声I），以下式1是训练loss的原始形式，通常使用的时候我们需要把x_t写成x_0的形式，在SD 1中又加入了一个平衡权重，就得到了式2，在推理过程中，也是构造一个高斯分布从中采样，这样丰富了结果，式3是构造的高斯分布的均值，式4是高斯分布的，但是这个采样过程也是后续主流模型不一样的点，比如DPMSolver++、Euler、Flux专用的FlowMatchEuler等都是有效的采样算法
+- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音就是正向扩散中从标准正态分布采样的噪声I），以下式1是训练loss的原始形式，通常使用的时候我们需要把x_t写成x_0的形式，在SD 1中又加入了一个平衡权重，就得到了式2，在推理过程中，也是构造一个高斯分布（式3）从中采样，其中I采样自标准正态分布，式4是均值，式5是方差系数，但是这个采样过程也是后续主流模型不一样的点，比如DPMSolver++、Euler、Flux专用的FlowMatchEuler等都是有效的采样算法
 
 <div align="center">
 
 $$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t, t) ||^2 \big] $$
 $$ L = \frac{1 - \overline{\alpha}_t}{\beta_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
-$$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
 $$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t^2 I) $$
+$$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
 $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alpha}_t} $$
 
 </div>
