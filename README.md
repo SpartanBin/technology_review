@@ -858,7 +858,7 @@ $$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t
 $$ L = \frac{1 - \overline{\alpha}_t}{\beta_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
 $$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
 $$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t^2 I) $$
-$$ \sigma_t^2 = \beta_t \frac{\overline{\alpha}_{t - 1}}}{\overline{\alpha}_t} $$
+$$ \sigma_t^2 = \beta_t \frac{\overline{\alpha}_{t - 1}}{\overline{\alpha}_t} $$
 
 </div>
 
