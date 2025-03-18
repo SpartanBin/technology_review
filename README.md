@@ -840,7 +840,7 @@ $$ \lambda = \frac{\nabla_{G_L} (L_{rec})}{\nabla_{G_L} (L_{GAN}) + \delta} $$
 - SD 1和VQ-GAN + transformer的结构可以说差不多，可以说就是对VQ-GAN做了小修改，并且把transformer的predict next token换成了U-Net diffusion
 - SD 1对VQ-GAN的小修改就是增强其avoid arbitrarily scaled latent spaces的能力（VQ-VAE loss第三项就是在做这件事），有两种方法解决这个，只选其中一种，1.增加VAE loss中的KL divergence项（使用极小的权重，原文是10^(−6)），2.增大codebook的dimension
 - SD 1的Latent Diffusion Models就是[DDPM (Denoising Diffusion Probabilistic Models)](https://arxiv.org/abs/2006.11239)，2020年发表的DDPM被认为是带火扩散模型的关键，DDPM的建模过程有两个阶段，一个是正向扩散，另一个是逆向生成，两个阶段都是马尔可夫链
-- DDPM正向扩散从原始图像x0开始，每一步都向图像中添加少量高斯噪声，得到x1, ...xT，当T足够大时xT将接近于标准正态分布，即纯噪声，式1是单步过程，式2是从x0直接采样，注意该过程并不是生成噪声beta_t并加到原图像（噪声图像）上，而是根据经过beta_t缩放的原图像和一个根据beta_t和标准正态分布采样出的噪声I得到的一个高斯分布，在从里面采样直接得到下一步噪声图像，而且beta_t是一个根据步数变化的数值（就像学习率一样），所以beta_t如何调度会明显影响收敛速度质量，原DDPM和SD 1都是线性变化的，但是后续研究证明线性调度会导致还是清晰图像时信息丢失太快，如果使用开头慢中间快结尾慢的形式，会对质量有较大影响，比如OpenAI的[Improved DDPM](https://arxiv.org/abs/2102.09672)就是使用了余弦调度，显著提升了效果，后续主流的一些图像生成的调度方式都不太一样（截止到2025.3），不过总的来说都是用的余弦相关，且需要精心设计
+- DDPM正向扩散从原始图像x0开始，每一步都向图像中添加少量高斯噪声，得到x1, ...xT，当T足够大时xT将接近于标准正态分布，即纯噪声，式1是单步过程，式2是从x0直接采样，注意该过程并不是生成噪声beta_t并加到原图像（噪声图像）上，而是根据经过beta_t缩放的原图像和一个根据beta_t和标准正态分布采样出的噪声I得到的一个高斯分布，在从里面采样直接得到下一步噪声图像，而且beta_t是一个根据步数变化的数值（就像学习率一样），所以beta_t如何调度会明显影响收敛速度质量，原DDPM和SD 1都是线性变化的，但是后续研究证明线性调度会导致还是清晰图像时信息丢失太快，如果使用开头慢中间快结尾慢的形式，会对质量有较大影响，比如OpenAI的[Improved DDPM](https://arxiv.org/abs/2102.09672)就是使用了余弦调度，显著提升了效果，后续主流的一些图像生成的调度方式都不太一样，不过总的来说都是用的余弦相关，且需要精心设计
 
 <div align="center">
 
@@ -850,13 +850,15 @@ $$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
 
 </div>
 
-- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音是否就是正向扩散中从标准正态分布采样的噪声I？），以下式1和式2都是训练的loss，式2是由x0经过采样直接得到，实际中用式2，式3是生成过程中用来算均值的
+- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音就是正向扩散中从标准正态分布采样的噪声I），以下式1是训练loss的原始形式，通常使用的时候我们需要把x_t写成x_0的形式，在SD 1中又加入了一个平衡权重，就得到了式2，在推理过程中，也是构造一个高斯分布从中采样，这样丰富了结果，式3是构造的高斯分布的均值，式4是高斯分布的，但是这个采样过程也是后续主流模型不一样的点，比如DPMSolver++、Euler、Flux专用的FlowMatchEuler等都是有效的采样算法
 
 <div align="center">
 
 $$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t, t) ||^2 \big] $$
-$$ L = \frac{1 - \overline{\alpha}_t}{\overline{\alpha}_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
+$$ L = \frac{1 - \overline{\alpha}_t}{\beta_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
 $$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
+$$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t^2 I) $$
+$$ \sigma_t^2 = \beta_t \frac{\overline{\alpha}_{t - 1}}}{\overline{\alpha}_t} $$
 
 </div>
 
