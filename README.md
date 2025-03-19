@@ -862,7 +862,7 @@ $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alph
 
 </div>
 
-- SD 1的模型结构和原U-Net差别还是很大，首先是要对时间步进行编码（没有看到具体用了什么编码方式，GPT说的是Sinusoidal Positional Embedding），然后需要针对condition进行建模，用的cross attention（就是KV来自condition，Q来自latent space的z或是diffusion model中间层的输出，需要将图像的HW flatten，然后要保证condition的最后一维和图像一样，不然不能做QK的矩阵乘法，其他和多头注意力没区别）+ feedforward net，他原文说自己就是在[Diffusion Models Beat GANs](https://arxiv.org/abs/2105.05233)的结构上增加了 a position-wise MLP 和 a cross-attention layer ，Diffusion Models Beat GANs 似乎又是改进自DDPM的网络结构，***溯源还是得去看代码！***
+- SD 1的模型结构和原U-Net差别还是很大，首先是要对时间步进行编码（没有看到具体用了什么编码方式，GPT说的是Sinusoidal Positional Embedding），然后需要针对condition进行建模，用的cross attention（就是KV来自condition，Q来自latent space的z或是diffusion model中间层的输出，需要将图像的HW维（空间维度） flatten，然后要保证condition的特征维度和图像一样，不然不能做QK的矩阵乘法，空间维（对应text就是时间维）不用一样，反正Q(K^T)V做完矩阵乘法，最后得到的结果就是HW，其他和多头注意力没区别）+ feedforward net，他原文说自己就是在[Diffusion Models Beat GANs](https://arxiv.org/abs/2105.05233)的结构上增加了 a position-wise MLP 和 a cross-attention layer ，Diffusion Models Beat GANs 似乎又是改进自DDPM的网络结构，***溯源还是得去看代码！***
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
