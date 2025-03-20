@@ -864,7 +864,7 @@ $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alph
 
 - SD 1的模型结构和原U-Net差别还是很大，首先是要对时间步进行编码（没有看到具体用了什么编码方式，GPT说的是Sinusoidal Positional Embedding），然后需要针对condition进行建模，用的cross attention（就是KV来自condition，Q来自latent space的z或是diffusion model中间层的输出，需要将图像的HW维（空间维度） flatten，然后要保证condition的特征维度和图像一样，不然不能做QK的矩阵乘法，空间维（对应text就是时间维）不用一样，反正Q(K^T)V做完矩阵乘法，最后得到的结果就是HW，其他和多头注意力没区别）+ feedforward net，他原文说自己就是在[Diffusion Models Beat GANs](https://arxiv.org/abs/2105.05233)的结构上增加了 a position-wise MLP 和 a cross-attention layer ，Diffusion Models Beat GANs 似乎又是改进自DDPM的网络结构，***溯源还是得去看代码！***
 - SDXL 的改进主要是调整了模型结构，比如加入了两个text conditional embedding，会将他们的结构concatenate在一起带入cross attention，在输入中加入 Pooled text emb、Micro-Conditioning，做了Multi-Aspect Training适应不同的图片尺寸，改进了VAE通过维护了一个EMA权重 (exponential moving average)来作为最终VAE模型权重，还有一个用于更清晰情况下去噪的Refinement Stage Model，训练目标方法等没有做调整，整个训练是分阶段进行的，就像LLM那样，***还是得去看源码！***
-- 直接看SD 3论文要搞清楚Rectified Flow Loss不太容易，问了GPT，看了HuggingFace论坛的讨论，loss应该是以下形式，Rectified Flow认为噪声图像x_t是原图像x_0和完全噪声epsilon组成的线性插值，扩散模型在这里面不是要去预测噪声，而是要去预测加噪的方向（也就是x_t相对t的倒数，epsilon - x_0），这个损失叫 Conditional Flow Matching Loss，U(0, 1)指0-1的均匀分布，SD 3还认为信噪比 SNR 在1:1也就是中间位置的时候是最难预测的，所以他们给了loss权重（所以以下loss还需要乘以该权重w），***得看源码确认！***
+- 直接看SD 3论文要搞清楚Rectified Flow Loss不太容易，问了GPT，看了HuggingFace论坛的讨论，loss应该是以下形式，Rectified Flow认为噪声图像x_t是原图像x_0和完全噪声epsilon组成的线性插值，扩散模型在这里面不是要去预测噪声，而是要去预测加噪的方向（也就是x_t相对t的倒数，epsilon - x_0），这个损失叫 Conditional Flow Matching Loss, U(0, 1)指0-1的均匀分布，SD 3还认为信噪比 SNR 在1:1也就是中间位置的时候是最难预测的，所以他们给了loss权重（所以以下loss还需要乘以该权重w），***得看源码确认！***
 
 <div align="center">
 
