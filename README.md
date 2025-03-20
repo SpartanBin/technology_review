@@ -870,8 +870,8 @@ $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alph
 
 $$ L_{CFM}(\theta) = \sum_{t \sim U(0, 1), x_0 \sim p_{data}, \epsilon \sim N(0, I)} \big[ || v_{\theta}(x_t, t) - (\epsilon - x_0) ||^2 \big] $$
 $$ x_t = (1 - t) x_0 + t \epsilon $$
-$$ w = \frac{t}{1 - t} \mathcal{\pi} $$
-$$ \mathcal{\pi} = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(log \frac{t}{1 - t} - m)^2}{2s^2} \big) $$
+$$ w = \frac{t}{1 - t} \pi \prime $$
+$$ \pi \prime = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(log \frac{t}{1 - t} - m)^2}{2s^2} \big) $$
 
 </div>
 
