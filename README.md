@@ -877,9 +877,10 @@ $$ \pi \prime = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(lo
 
 <p align = "center">
 <img src=/img/sd3_entirety.png width="1000" />
+<img src=/img/sd3_dit.png width="1000" />
 </p>
 
-- 
+- SD 3的结构没讲清除，SD 3说它的 architecture builds upon the [DiT](https://arxiv.org/abs/2212.09748)，但它实际上比DiT复杂多了（SD 3是上，DiT是下），DiT的condition是用 a modification of the adaLN（adaLN, Adaptive Layer Norm 就是将条件condition融入到Layer Norm里的一种方法，就是用一个线性变换或者MLP将condition预测成Layer Norm里的缩放因子gamma和偏置beta，注意和原Layer Norm一样这都是向量哈，然后DiT又加了一个预测alpha缩放因子在FFN之后再缩放，也是向量） 加入的，而SD 3是直接和图像concatenate的，SD 3把一部分text encoder的输出pooled之后与timestep连接在一起，这个pooled也没有看懂，不知道是怎么操作的，还有三个text encoding是怎么合并的也没看懂，***看代码！***
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
