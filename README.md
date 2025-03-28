@@ -875,6 +875,12 @@ $$ \pi \prime = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(lo
 
 </div>
 
+<p align = "center">
+<img src=/img/sd3_entirety.png width="1000" />
+</p>
+
+- 
+
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
 - Movie Gen: A Cast of Media Foundation Models
