@@ -739,6 +739,7 @@ $$ KL = - \frac{1}{2} \sum_{i=1}^{d} [1 + ln(\sigma_i^2) - \mu_i^2 - \sigma_i^2]
 </div>
 
 ```python
+import torch
 import torch.nn as nn
 
 # 定义 VAE 模型
@@ -862,8 +863,9 @@ $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alph
 
 </div>
 
-- SD 1的模型结构和原U-Net差别还是很大，首先是要对时间步进行编码（没有看到具体用了什么编码方式，GPT说的是Sinusoidal Positional Embedding），然后需要针对condition进行建模，用的cross attention（就是KV来自condition，Q来自latent space的z或是diffusion model中间层的输出，需要将图像的HW维（空间维度） flatten，然后要保证condition的特征维度和图像一样，不然不能做QK的矩阵乘法，空间维（对应text就是时间维）不用一样，反正Q(K^T)V做完矩阵乘法，最后得到的结果就是HW，其他和多头注意力没区别）+ feedforward net，他原文说自己就是在[Diffusion Models Beat GANs](https://arxiv.org/abs/2105.05233)的结构上增加了 a position-wise MLP 和 a cross-attention layer ，Diffusion Models Beat GANs 似乎又是改进自DDPM的网络结构，***溯源还是得去看代码！***
+- SD 1的模型结构和原U-Net差别还是很大，首先是要对时间步进行编码（没有看到具体用了什么编码方式，GPT说的是Sinusoidal Positional Embedding，也就是原transformer论文中最原始那个PE，极有可能就是这个，因为SD 3就是用的这个），然后需要针对condition进行建模，用的cross attention（就是KV来自condition，Q来自latent space的z或是diffusion model中间层的输出，需要将图像的HW维（空间维度） flatten，然后要保证condition的特征维度和图像一样，不然不能做QK的矩阵乘法，空间维（对应text就是时间维）不用一样，反正Q(K^T)V做完矩阵乘法，最后得到的结果就是HW，其他和多头注意力没区别）+ feedforward net，他原文说自己就是在[Diffusion Models Beat GANs](https://arxiv.org/abs/2105.05233)的结构上增加了 a position-wise MLP 和 a cross-attention layer ，Diffusion Models Beat GANs 似乎又是改进自DDPM的网络结构，***溯源还是得去看代码！***
 - SDXL 的改进主要是调整了模型结构，比如加入了两个text conditional embedding，会将他们的结构concatenate在一起带入cross attention，在输入中加入 Pooled text emb、Micro-Conditioning，做了Multi-Aspect Training适应不同的图片尺寸，改进了VAE通过维护了一个EMA权重 (exponential moving average)来作为最终VAE模型权重，还有一个用于更清晰情况下去噪的Refinement Stage Model，训练目标方法等没有做调整，整个训练是分阶段进行的，就像LLM那样，***还是得去看源码！***
+- SD 3 有三个 text encoder，且是用的预训练模型，autoencoder (VQ-GAN) 也是提前训练好的，训练扩散模型时，text encoder 和 autoencoder 是冻结参数了的
 - 直接看SD 3论文要搞清楚Rectified Flow Loss不太容易，问了GPT，看了HuggingFace论坛的讨论，loss应该是以下形式，Rectified Flow认为噪声图像x_t是原图像x_0和完全噪声epsilon组成的线性插值，扩散模型在这里面不是要去预测噪声，而是要去预测加噪的方向（也就是x_t相对t的倒数，epsilon - x_0），这个损失叫 Conditional Flow Matching Loss, U(0, 1)指0-1的均匀分布，SD 3还认为信噪比 SNR 在1:1也就是中间位置的时候是最难预测的，所以他们给了loss权重（所以以下loss还需要乘以该权重w），***得看源码确认！***
 
 <div align="center">
@@ -881,6 +883,8 @@ $$ \pi \prime = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(lo
 </p>
 
 - SD 3的结构没讲清除，SD 3说它的 architecture builds upon the [DiT](https://arxiv.org/abs/2212.09748)，但它实际上比DiT复杂多了（SD 3是上，DiT是下），DiT的condition是用 a modification of the adaLN（adaLN, Adaptive Layer Norm 就是将条件condition融入到Layer Norm里的一种方法，就是用一个线性变换或者MLP将condition预测成Layer Norm里的缩放因子gamma和偏置beta，注意和原Layer Norm一样这都是向量哈，然后DiT又加了一个预测alpha缩放因子在FFN之后再缩放，也是向量） 加入的，而SD 3是直接和图像concatenate的，SD 3把一部分text encoder的输出pooled之后与timestep连接在一起，这个pooled也没有看懂，不知道是怎么操作的，还有三个text encoding是怎么合并的也没看懂，***看代码！***
+- SD 3使用1: 1的原提示词 (caption)和合成提示词，遵循 DALL-E 3 的合成提示词方法，并使用 vision-language model [CogVLM](https://arxiv.org/abs/2311.03079) 作为生成模型
+- SD 3数据清洗：1.用 NSFW-detection models 去清除成人内容，2.有一个 rating systems 给图片打分，去掉低分图片，3.用一个 cluster-based deduplication method 去除 perceptual and semantic duplicate（详见原文附录）
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
