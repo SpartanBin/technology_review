@@ -885,6 +885,7 @@ $$ \pi \prime = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(lo
 - SD 3的结构没讲清除，SD 3说它的 architecture builds upon the [DiT](https://arxiv.org/abs/2212.09748)，但它实际上比DiT复杂多了（SD 3是上，DiT是下），DiT的condition是用 a modification of the adaLN（adaLN, Adaptive Layer Norm 就是将条件condition融入到Layer Norm里的一种方法，就是用一个线性变换或者MLP将condition预测成Layer Norm里的缩放因子gamma和偏置beta，注意和原Layer Norm一样这都是向量哈，然后DiT又加了一个预测alpha缩放因子在FFN之后再缩放，也是向量） 加入的，而SD 3是直接和图像concatenate的，SD 3把一部分text encoder的输出pooled之后与timestep连接在一起，这个pooled也没有看懂，不知道是怎么操作的，还有三个text encoding是怎么合并的也没看懂，***看代码！***
 - SD 3使用1: 1的原提示词 (caption)和合成提示词，遵循 DALL-E 3 的合成提示词方法，并使用 vision-language model [CogVLM](https://arxiv.org/abs/2311.03079) 作为生成模型
 - SD 3数据清洗：1.用 NSFW-detection models 去清除成人内容，2.有一个 rating systems 给图片打分，去掉低分图片，3.用一个 cluster-based deduplication method 去除 perceptual and semantic duplicate（详见原文附录）
+- SD 3使用 2d positional frequency embeddings（不知道是什么，感觉就是原PE改成2D），使用分桶采样针对不同的图片尺寸，根据分辨率不同调整了添加噪声的强度，高分辨率下噪声添加强度会增加（实际除了基础分辨率512 * 512，其他都是添加了一个固定系数，等于3），使用 [DDPO (Diffusion DPO)](https://arxiv.org/abs/2311.12908) 进行微调让模型更好的服从提示词（相见DDPO原文）
 
 ## <span id="202502021753"> Movie Gen </span>
 - Meta, 2024.10
