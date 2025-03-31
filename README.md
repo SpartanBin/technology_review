@@ -674,8 +674,8 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - DeepSeekMath 微调自[DeepSeek-Coder](https://arxiv.org/abs/2401.14196) 7B，超过一半数据来自 Common Crawl (CC) ，使用部分[OpenWebMath](https://arxiv.org/abs/2310.06786)作为正例部分CC作为负例，训练了一个[fastText model](https://arxiv.org/abs/1612.03651)，使用该模型从CC中提取 mathematical web pages ，还对提取的数据质量进行了验证（详见原文），SFT数据是经过领域和难度划分的，problems are paired with solutions 通过 chain-of-thought (CoT), [program-of-thought (PoT)](https://arxiv.org/abs/2211.12588), [tool-integrated reasoning format](https://arxiv.org/abs/2309.17452)，获得了776K的 training examples
 
 <p align = "center">
-<img src=/img/deepseek_mathPOT_1.png width="450" />
-<img src=/img/deepseek_mathPOT_2.png width="450" />
+<img src=/img/deepseek_mathPOT_1.png width="400" />
+<img src=/img/deepseek_mathPOT_2.png width="400" />
 </p>
 
 - PoT就是将思维链过程写成一步一步的python代码，然后用python解释器求解，因为在代码中间变量也可以用符号表示，不需要立刻求解，这样子就避免了CoT中自然语言求解数值问题时易发生的错误
