@@ -87,30 +87,30 @@ class MultiHeadAttention(nn.Module):
 
     def forward(self, key, value, query):
 
-        B, L, D = query.size()
+        kv_L = key.size()[1]
+        B, q_L, D = query.size()
 
-        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
-        k = self.key(key).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
-        q = self.query(query).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
-        v = self.value(value).view(B, L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, L, hs)
+        # calculate key, value, query for all heads in batch and move head forward to be the batch dim
+        k = self.key(key).view(B, kv_L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, kv_L, hs)
+        v = self.value(value).view(B, kv_L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, kv_L, hs)
+        q = self.query(query).view(B, q_L, self.n_head, D // self.n_head).transpose(1, 2)  # (B, nh, q_L, hs)
 
-        # causal attention: (B, nh, L, hs) x (B, nh, hs, L) -> (B, nh, L, L)
+        # causal attention: (B, nh, q_L, hs) x (B, nh, hs, kv_L) -> (B, nh, q_L, kv_L)
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
 
         if self.masked:
             att = att.masked_fill(self.mask == 0, float('-inf'))
         att = F.softmax(att, dim=-1)
 
-        y = att @ v  # (B, nh, L, L) x (B, nh, L, hs) -> (B, nh, L, hs)
-        y = y.transpose(1, 2).contiguous().view(B, L, D)  # re-assemble all head outputs side by side
+        y = att @ v  # (B, nh, q_L, kv_L) x (B, nh, kv_L, hs) -> (B, nh, q_L, hs)
+        y = y.transpose(1, 2).contiguous().view(B, q_L, D)  # re-assemble all head outputs side by side
 
         # output projection
         y = self.proj(y)
 
         return y
 ```
-- k、q、v都是同一个tensor经过linear transformation得到的（至少对于encoder是这样），对于decoder来说k、v的原tensor来自encoder的输出
-- 如果堆叠多层decoder，每一层的k、v的原tensor都是同一个tensor，就是encoder的输出
+- k、q、v都是同一个tensor经过linear transformation得到的（至少对于encoder是这样），对于decoder来说，第一层多头的k、v来自decoder自己，第二层多头的k、v来自encoder，如果堆叠多个encoder、decoder块，decoder每一块的来自encoder的k、v都是一样的，就是encoder的最后一层输出，注意正是因为此特性，所以encoder和decoder的时间维度大小可以不一样（输入tokens序列长度可以不一样）
 - Feed Forward只作用于最后一个维度(d_model)，就是一个两层FCN，宽度通常大于d_model，先把d_model拉大，再还原到原大小，激活函数使用的ReLU
 - residual是先加后接LayerNorm
 - Positional Encoding实现，GPT生成
@@ -144,7 +144,7 @@ def positional_encoding(seq_length, d_model):
 ```
 - 这个位置编码与原tensor相加就应用了该位置编码
 - div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))是在计算 10000^(2i/d_model) 的倒数，即 1 / (10000^(2i/d_model))，控制不同维度的位置编码缩放
-- 未解决的疑问：transformer原本是被设计出来解决翻译问题的，翻译问题的encoder输入肯定是被翻译语言，decoder的输入是什么？还有就是encoder的输入的L和decoder的L不一样长怎么办，是否要求一样长？
+- transformer是被设计出来解决翻译问题的，因此encoder的输入是被翻译语言，decoder的输入是目标翻译语言，和LLM一样，decoder是一个一个token去预测的，因此inference的时候decoder的输入就是他刚才自己预测并输出的token，training的时候理应用teaching force就是强制和label一样
 
 ## <span id="202502021732"> BERT </span>
 - Google AI Language, 2018.10
