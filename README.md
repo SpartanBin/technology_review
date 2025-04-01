@@ -144,7 +144,7 @@ def positional_encoding(seq_length, d_model):
 ```
 - 这个位置编码与原tensor相加就应用了该位置编码
 - div_term = np.exp(np.arange(0, d_model, 2) * (-np.log(10000.0) / d_model))是在计算 10000^(2i/d_model) 的倒数，即 1 / (10000^(2i/d_model))，控制不同维度的位置编码缩放
-- transformer是被设计出来解决翻译问题的，因此encoder的输入是被翻译语言，decoder的输入是目标翻译语言，和LLM一样，decoder是一个一个token去预测的，因此inference的时候decoder的输入就是他刚才自己预测并输出的token，training的时候理应用teaching force就是强制和label一样
+- transformer是被设计出来解决翻译问题的，因此encoder的输入是被翻译语言，decoder的输入是目标翻译语言，和LLM一样，decoder是自回归的，也就是一个一个token去预测的，因此inference的时候decoder的输入就是他刚才自己预测并输出的token，training的时候理应用teaching force就是强制和label一样
 
 ## <span id="202502021732"> BERT </span>
 - Google AI Language, 2018.10
