@@ -578,8 +578,8 @@ $$ L = -log(\sigma(r_{\theta}(x, y_c) - r_{\theta}(x, y_r) - m(r))) $$
 
 </div>
 
-- Llama 2使用了两种RL的方法，一种就是PPO，另一种是Rejection Sampling fine-tuning（RS），在前几轮里只用RS，后面把PPO用到RS的最优结果上，然后他们最大的模型才用了RS，小的模型都是使用的大模型RS的样本（他们称此为蒸馏 distillation）
-- Rejection Sampling fine-tuning（RS）就是对一个prompt生成多个回答，然后选出RM评分最高的那个，然后用最大化对数概率之和训练（这个是我猜的，因为他毕竟叫fine-tuning，原文又没写）
+- Llama 2使用了两种RL的方法，一种就是PPO，另一种是 Rejection Sampling fine-tuning (RS), 在前几轮里只用RS，后面把PPO用到RS的最优结果上，然后他们最大的模型才用了RS，小的模型都是使用的大模型RS的样本（他们称此为蒸馏 distillation）
+- Rejection Sampling fine-tuning (RS) 就是对一个prompt生成多个回答，然后选出RM评分最高的那个，然后用最大化对数概率之和训练（这个是我猜的，因为他毕竟叫fine-tuning，原文又没写）
 - Llama 2使用提出了一个叫 Ghost Attention (GAtt)的方法，以用来让模型一直重点关注某些提示，比如扮演成某个名人等，他的做法没有看懂，似乎是不断简洁精炼这些重要的系统提示，然后再与后续的对话拼接在一起？
 - 沐神说现在很多llm都是支持的8k上下文，训练的时候上下文是8k，但是部署的时候可以是32k，从实用上，32k的上下文长度对llm就够了，128k就更够了
 - 沐神说Llama 3没有给出具体的数据采样方法，就是在什么训练时期，哪些类型的数据（比如数学、code）的采样率是多少，这个数据采样率也十分重要
@@ -685,7 +685,13 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 <img src=/img/deepseek_mathtirf_2.png width="600" />
 </p>
 
-- tool-integrated reasoning format
+- tool-integrated reasoning format认为单单是CoT的文字思维链和单单是PoT的写代码都是行不通的，应该将这个过程组合起来，因此它的推理过程是 qpraoraorao...rao..., q就是提出的问题，p是给的示例提示，如果是zero-shot，p就没有，r是文字思维链，a是写的要给解释器的代码，o是解释器返回的结果，然后直到达到最大rao循环数量或模型输出终止符，即停止，论文是用GPT 4生成的这个过程数据，并用模仿学习 (minimizing negative log-likelihood loss) 去训练他们的模型，还有一个Output Space Shaping步骤（比较类似Rejection Sampling fine-tuning (RS)）来对模仿学习后的模型再训练纠错（详见原文）
+
+<p align = "center">
+<img src=/img/deepseek_mathgrpo.png width="800" />
+</p>
+
+- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
