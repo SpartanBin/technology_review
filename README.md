@@ -22,7 +22,7 @@
 - [DPO (Stanford University, 2023.5)](#202502191442)
 - [Llama 1 2 3 (Meta, 2023.2, 2023.7, 2024.7)](#202502021743)
 - [Mistral AI Models (Mistral AI, 2023.10, 2024.1, 2024.10)](#202502022356)
-- [DeepSeek Models (DeepSeek-AI, 2024.1, 2024.2)](#202503302359)
+- [DeepSeek Models (DeepSeek-AI, 2024.1, 2024.2, 2024.3, 2024.5, 2024.12, 2025.1)](#202503302359)
 - [Flamingo (DeepMind, 2022.4)](#202502151055)
 - [Whisper (OpenAI, 2022.12)](#202502021744)
 - [Noise2Music (Google Research, 2023.2)](#202502030008)
@@ -666,10 +666,14 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 - 图中那个Vision-Language Projector是一个用了GeLU激活的两层fcn，用来统一dimension，在decoder中图像token也会被视为文字token，比如同样要使用1D的RoPE处理，文章也没有说encoder和decoder合并后，要怎么一起微调
 
 ## <span id="202503302359"> DeepSeek Models </span>
-- DeepSeek-AI, 2024.1, 2024.2
+- DeepSeek-AI, 2024.1, 2024.2, 2024.3, 2024.5, 2024.12, 2025.1
 - [是一系列模型](https://www.deepseek.com/)
 - DeepSeek LLM: Scaling Open-Source Language Models with Longtermism
 - DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models
+- DeepSeek-VL: Towards Real-World Vision-Language Understanding
+- DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model
+- DeepSeek-V3 Technical Report
+- DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning
 - DeepSeek LLM 的结构就是LLaMA的结构，但是较大的模型67B使用了GQA，一样使用了warm up的余弦调度，其他超参数详见原文，服务器架构使用了幻方量化自研的[HAI-LLM](https://www.high-flyer.cn/en/blog/hai-llm/), 就像[Megatron](https://github.com/NVIDIA/Megatron-LM)那样融合了data parallelism, tensor parallelism, sequence parallelism, and 1F1B pipeline parallelism, 使用[flash attention](https://github.com/Dao-AILab/flash-attention)提高硬件利用率, [DeepSpeed](https://github.com/deepspeedai/DeepSpeed)的ZeRO-1进行优化器计算优化，DeepSeek LLM还研究了scaling laws（详见原文），并使用了SFT和DPO
 - DeepSeekMath 微调自[DeepSeek-Coder](https://arxiv.org/abs/2401.14196) 7B，超过一半数据来自 Common Crawl (CC) ，使用部分[OpenWebMath](https://arxiv.org/abs/2310.06786)作为正例部分CC作为负例，训练了一个[fastText model](https://arxiv.org/abs/1612.03651)，使用该模型从CC中提取 mathematical web pages ，还对提取的数据质量进行了验证（详见原文），SFT数据是经过领域和难度划分的，problems are paired with solutions 通过 chain-of-thought (CoT), [program-of-thought (PoT)](https://arxiv.org/abs/2211.12588), [tool-integrated reasoning format](https://arxiv.org/abs/2309.17452)，获得了776K的 training examples
 
