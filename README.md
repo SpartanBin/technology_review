@@ -685,7 +685,7 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 <img src=/img/deepseek_mathtirf_2.png width="600" />
 </p>
 
-- tool-integrated reasoning format认为单单是CoT的文字思维链和单单是PoT的写代码都是行不通的，应该将这个过程组合起来，因此它的推理过程是 qpraoraorao...rao..., q就是提出的问题，p是给的示例提示，如果是zero-shot，p就没有，r是文字思维链，a是写的要给解释器的代码，o是解释器返回的结果，然后直到达到最大rao循环数量或模型输出终止符，即停止，论文是用GPT 4生成的这个过程数据，并用模仿学习 (minimizing negative log-likelihood loss) 去训练他们的模型，还有一个Output Space Shaping步骤（比较类似Rejection Sampling fine-tuning (RS)）来对模仿学习后的模型再训练纠错（详见原文）
+- tool-integrated reasoning format认为单单是CoT的文字思维链和单单是PoT的写代码都是行不通的，应该将这个过程组合起来，因此它的推理过程是 qpraoraorao...rao..., q就是提出的问题，p是给的示例提示，如果是zero-shot，p就没有，r是文字思维链，a是写的要给解释器的代码，o是解释器返回的结果，然后直到达到最大rao循环数量或模型输出终止符，即停止，论文是用GPT 4生成的这个过程数据，并用模仿学习 (minimizing negative log-likelihood loss) 去训练他们的模型，还有一个Output Space Shaping步骤来对模仿学习后的模型再训练纠错（详见原文）
 
 <p align = "center">
 <img src=/img/deepseek_mathgrpo.png width="800" />
