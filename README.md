@@ -679,6 +679,12 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 </p>
 
 - PoT就是将思维链过程写成一步一步的python代码，然后用python解释器求解，因为在代码中间变量也可以用符号表示，不需要立刻求解，这样子就避免了CoT中自然语言求解数值问题时易发生的错误
+
+<p align = "center">
+<img src=/img/deepseek_mathtirf_1.png width="400" />
+<img src=/img/deepseek_mathtirf_2.png width="400" />
+</p>
+
 - tool-integrated reasoning format
 
 ## <span id="202502151055"> Flamingo </span>
