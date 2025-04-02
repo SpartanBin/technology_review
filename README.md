@@ -697,7 +697,7 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 
 <div align="center">
 
-$$ \mathcal{Object}_{GRPO}(\theta) = E_{q \sim P(Q), \{o_i\}} $$
+$$ \mathcal{Object}_{GRPO}(\theta) = E_{q \sim P(Q), \{o_i\}_{i = 1}^G} $$
 
 </div>
 
