@@ -700,6 +700,7 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 $$ \mathcal{Object}_{GRPO}(\theta) = E_{q \sim P(Q), \{o_i\}_{i = 1}^G \sim \pi_{\theta_{old}}(O | q)} \frac{1}{G} \sum_{i=1}^G \frac{1}{|o_i|} \sum_{t=1}^{|o_i|} \big\{ min \big[ R \hat{A}_{i, t}, clip \big( R, 1 - \epsilon, 1 + \epsilon \big) \hat{A}_{i, t} \big] - \beta D_{KL}[\pi_{\theta} || \pi_{ref}] \big\} $$
 $$ R = \frac{\pi_{\theta}(o_{i, t} | q, o_{i, < t})}{\pi_{\theta_{old}}(o_{i, t} | q, o_{i, < t})} $$
 $$ D_{KL}[\pi_{\theta} || \pi_{ref}] = \frac{\pi_{ref}(o_{i, t} | q, o_{i, < t})}{\pi_{\theta}(o_{i, t} | q, o_{i, < t})} - log \frac{\pi_{ref}(o_{i, t} | q, o_{i, < t})}{\pi_{\theta}(o_{i, t} | q, o_{i, < t})} - 1 $$
+$$ \hat{A}_{i, t} = \widetilde{r}_i = \frac{r_i - mean(*r*)}{std(*r*)} $$
 
 </div>
 
