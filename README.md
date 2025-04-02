@@ -706,7 +706,8 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 
 </div>
 
-- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，GRPO需要最大化以上目标
+- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，GRPO需要最大化以上目标，GRPO和PPO的区别如下，GRPO没有critic，因此模型大小相当于小了一半，且RLHF的奖励信号是稀疏的，因为只有最后一步（最后一个token）才给奖励，其他时间步奖励都是0，作者说这样子增加了训练critic的难度，所以作者认为没有critic训练变简单了占用资源变小了，所以GRPO就需要解决预测状态价值baseline的问题，解决方法就是 "Group" ，只要我每次不是只采样一个 trajectory ，而是采样 G 个，那我取“平均值”不就相当于有baseline了撒，所以在 Outcome Supervision RL with GRPO（稀疏奖励信号，仅最后一个step有奖励）的设置下，估算advantage value的方法就是normalization G个reward，然后作者把他改成了稠密奖励，直接认为整条trajectory的每一个step的adv都是刚刚算出的这个normalization reward（公式4），另外作者还讨论了一种 Process Supervision RL with GRPO 的设置，是他们的另一篇[论文](https://arxiv.org/abs/2312.08935)的成果，能直接获得稠密奖励，因此adv的计算方式被改为了公式5、6
+- 还可以看到 GRPO 有一个KL divergence的项类似于RLHF中奖励数值里要加入的KL项让policy不要被训练得太偏离参考模型（通常是SFT后的模型），但是他们改进了该项，换成了Schulman（提出PPO的那位大牛）推导出的对KL divergence的无偏估计，详细可参考[blog](http://joschu.net/blog/kl-approx.html)
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
