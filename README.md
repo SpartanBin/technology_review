@@ -695,7 +695,13 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 <img src=/img/deepseek_mathgrpo.png width="800" />
 </p>
 
-- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，
+<div align="center">
+
+$$ \mathcal{Object}_{GRPO}(\theta) = E_{q \sim P(Q), \{o_i\}} $$
+
+</div>
+
+- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，GRPO需要最大化以上目标
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
