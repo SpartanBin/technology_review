@@ -706,7 +706,8 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 
 </div>
 
-- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，GRPO需要最大化以上目标，GRPO和PPO的区别如下，GRPO没有critic，因此模型大小相当于小了一半，且RLHF的奖励信号是稀疏的，因为只有最后一步（最后一个token）才给奖励，其他时间步奖励都是0，作者说这样子增加了训练critic的难度，所以作者认为没有critic训练变简单了占用资源变小了，所以GRPO就需要解决预测状态价值baseline的问题，解决方法就是 "Group" ，只要我每次不是只采样一个 trajectory ，而是采样 G 个，那我取“平均值”不就相当于有baseline了撒，所以在 Outcome Supervision RL with GRPO（稀疏奖励信号，仅最后一个step有奖励）的设置下，估算advantage value的方法就是normalization G个reward，然后作者把他改成了稠密奖励，直接认为整条trajectory的每一个step的adv都是刚刚算出的这个normalization reward（公式4），另外作者还讨论了一种 Process Supervision RL with GRPO 的设置，是他们的另一篇论文 [MATH-SHEPHERD](https://arxiv.org/abs/2312.08935) 的成果，能直接获得稠密奖励，因此adv的计算方式被改为了公式5、6
+- 注意，因为 DeepSeekMath 已经经过CoT、PoT等数据类型的SFT了，现在模型的输出形式已经变化了，会输出类似 <Step> 这样的特殊类型token作为分隔符，将整个回答分成 <Step>...<Step> 一段一段的推理过程，每一段被视为一个推理步 (reasoning step)，当然每一个时间步还是一个token
+- DeepSeekMath 最后使用了 Group Relative Policy Optimization (GRPO) 进行训练，GRPO需要最大化以上目标，GRPO和PPO的区别如下，GRPO没有critic，因此模型大小相当于小了一半，且RLHF的奖励信号是稀疏的，因为只有最后一个推理步的最后一个token才给奖励，其他时间步奖励都是0，作者说这样子增加了训练critic的难度，所以作者认为没有critic训练变简单了占用资源变小了，所以GRPO就需要解决预测状态价值baseline的问题，解决方法就是 "Group" ，只要我每次不是只采样一个 trajectory ，而是采样 G 个，那我取“平均值”不就相当于有baseline了撒，所以在 Outcome Supervision RL with GRPO（稀疏奖励信号，仅最后一个推理步的最后一个token有奖励）的设置下，估算 advantage value (adv) 的方法就是normalization G个reward，然后直接认为整条trajectory的每一个step的adv都是刚刚算出的这个normalization reward（公式4），另外作者还讨论了一种 Process Supervision RL with GRPO 的设置，是他们的另一篇论文 [MATH-SHEPHERD](https://arxiv.org/abs/2312.08935) 的成果，能获得每一个推理步的最后一个token的奖励，虽然也是稀疏的，但是可以让模型更易区分每个推理步的对错，因此adv的计算方式被改为了公式5、6，注意index(j)是第j个推理步的最后一个时间步 (token) 的index，K自然就是最后一个推理步，求解该adv简单来说，就是认为每一个推理步内的时间步的adv是一样的，adv(t)等于时间步t所在的推理步及其之后的推理步的index(j)（推理步内的最后一个时间步）的normalization rewards之和
 - 还可以看到 GRPO 有一个KL divergence的项类似于RLHF中奖励数值里要加入的KL项让policy不要被训练得太偏离参考模型（通常是SFT后的模型），但是他们改进了该项，换成了Schulman（提出PPO的那位大牛）推导出的对KL divergence的无偏估计，详细可参考[blog](http://joschu.net/blog/kl-approx.html)
 
 <p align = "center">
@@ -714,7 +715,12 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 </p>
 
 - 看伪代码可以看到每次更新reward model (RM)时参考模型也会更新成policy model (PM)，更新RM是继续训练旧的RM，数据集是 based on the sampling results from the policy model and incorporates 10% of historical data，合成训练RM的数据集方法也是来自 MATH-SHEPHERD ，另外PM是初始化自 DeepSeekMath-Instruct 7B ，RM是训练自DeepSeekMath-Base 7B with a learning rate (lr) of 2e-5，训练 PM 超参数 lr 1e-6, beta (KL coefficient) 0.04, G 64, batch size 1024, and only has a single update following each exploration stage，最后发现只用CoT数据训练RL都能有较大的提升，且代码数据有利于数学推理，arxiv数据没什么用，最后作者将SFT, Rejection Sampling Fine-tuning (RS), DPO, Online RS, PPO, GRPO都统一成了一种泛RL范式（详见原文），作者通过实验结论认为RL相比SFT是提升了模型的最优表现，而SFT是提升基础能力
-- MATH-SHEPHERD
+
+<p align = "center">
+<img src=/img/deepseek_math_math-shepherd.png width="800" />
+</p>
+
+- MATH-SHEPHERD就是像蒙托卡罗树搜索那样，从每一个推理步开始或许会再往后采样若干个trajectory，然后分为两种估计模型，硬估计和软估计，硬估计是往后的trajectory只要有一条能得到正确答案，则该推理步打分1，软则是正确数量占比作分数
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
