@@ -693,7 +693,7 @@ $$
 $$
 $$ s_{i, t} = Softmax({u_t^l}^T \times e_i^l) $$
 $$ L_{ExpBal} = \alpha_1 \sum_{i=1}^{N^{\prime}} f_i P_i, N^{\prime} = mN - K_s $$
-$$ f_i = \frac{N^{\prime}}{K^{\prime} T} \sum_{t=1}^{T} \pmb{1}(Token t selects Expert i), K^{\prime} = mK - K_s, \pmb{1}() denotes the indicator function $$
+$$ f_i = \frac{N^{\prime}}{K^{\prime} T} \sum_{t=1}^{T} \pmb{1}(Token \quad t \quad selects \quad Expert \quad i), K^{\prime} = mK - K_s, \pmb{1}() denotes the indicator function $$
 $$ P_i = \frac{1}{T} \sum_{t=1}^{T} s_{i, t} $$
 $$ L_{DevBal} = \alpha_2 \sum_{i=1}^{D} f_i^{\prime} P_i^{\prime}, D groups: \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
 $$ f_i^{\prime} = \frac{1}{|\epsilon_i|} \sum_{j \sim \epsilon_i} f_j $$
