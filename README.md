@@ -687,7 +687,7 @@ $$ h_t^l = \sum_{i=1}^{K_s} FFN_i(u_t^l) + \sum_{i=K_s+1}^{mN} \big( g_{i, t} FF
 $$ 
     g_{i, t} =
     \begin{cases}
-        s_{i, t}, s_{i, t} \sim Topk( \{ s_{j, t} | K_s + 1 <= j <= mN \}, mK - K_s), \\
+        s_{i, t}, s_{i, t} \in Topk( \{ s_{j, t} | K_s + 1 <= j <= mN \}, mK - K_s), \\
         0, otherwise, 
     \end{cases}
 $$
@@ -696,8 +696,8 @@ $$ L_{ExpBal} = \alpha_1 \sum_{i=1}^{N^{\prime}} f_i P_i, N^{\prime} = mN - K_s 
 $$ f_i = \frac{N^{\prime}}{K^{\prime} T} \sum_{t=1}^{T} \pmb{1}(t), K^{\prime} = mK - K_s $$
 $$ P_i = \frac{1}{T} \sum_{t=1}^{T} s_{i, t} $$
 $$ L_{DevBal} = \alpha_2 \sum_{i=1}^{D} f_i^{\prime} P_i^{\prime} $$
-$$ f_i^{\prime} = \frac{1}{|\epsilon_i|} \sum_{j \sim \epsilon_i} f_j, \epsilon_i \sim \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
-$$ P_i^{\prime} = \sum_{j \sim \epsilon_i} P_j $$
+$$ f_i^{\prime} = \frac{1}{|\epsilon_i|} \sum_{j \in \epsilon_i} f_j, \epsilon_i \in \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
+$$ P_i^{\prime} = \sum_{j \in \epsilon_i} P_j $$
 
 </div>
 
