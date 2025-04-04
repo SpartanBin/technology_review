@@ -692,11 +692,16 @@ $$
     \end{cases}
 $$
 $$ s_{i, t} = Softmax({u_t^l}^T \times e_i^l) $$
-$$ L_{ExpBal} = \alpha_1 \sum_{i=1}^{N} $$
+$$ L_{ExpBal} = \alpha_1 \sum_{i=1}^{N^{\prime}} f_i P_i, N^{\prime} = mN - K_s $$
+$$ f_i = \frac{N^{\prime}}{K^{\prime} T} \sum_{t=1}^{T} \pmb{1}(Token t selects Expert i), K^{\prime} = mK - K_s, \pmb{1}() denotes the indicator function $$
+$$ P_i = \frac{1}{T} \sum_{t=1}^{T} s_{i, t} $$
+$$ L_{DevBal} = \alpha_2 \sum_{i=1}^{D} f_i^{\prime} P_i^{\prime}, D groups: \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
+$$ f_i^{\prime} = \frac{1}{|\epsilon_i|} \sum_{j \sim \epsilon_i} f_j $$
+$$ P_i^{\prime} = \sum_{j \sim \epsilon_i} P_j $$
 
 </div>
 
-- DeepSeekMoE 和通常的MoE架构区别不大，简单来说就是增加了多个共享专家是每个token都要路由的，且把专家数量翻了m倍（比如N个变成mN个，原本每次选top K个也变成选top mK个），且每个专家参数量也缩小，所以总参数量还是不变（上图a是通常，bc是DeepSeekMoE），因为作者认为这样有利于更多的可能专家组合，且每个专家变小了，知识特化会做的更好，在load balance上使用了两个loss，一个是 Expert-Level Balance Loss ，一个是 Device-Level Balance Loss ，第一个loss就是专家负载均衡，第二个是设备负载均衡，作者给第一个赋的权重较小，第二个较大
+- DeepSeekMoE 和通常的MoE架构区别不大，简单来说就是增加了多个共享专家是每个token都要路由的，且把专家数量翻了m倍（比如N个变成mN个，原本每次选top K个也变成选top mK个），且每个专家参数量也缩小，所以总参数量还是不变（上图a是通常，bc是DeepSeekMoE），因为作者认为这样有利于更多的可能专家组合，且每个专家变小了，知识特化会做的更好，在load balance上使用了两个loss，一个是 Expert-Level Balance Loss（公式456），一个是 Device-Level Balance Loss（公式56789），第一个loss就是专家负载均衡，第二个是设备负载均衡，作者给第一个赋的权重较小，第二个较大
 - DeepSeekMath 微调自[DeepSeek-Coder](https://arxiv.org/abs/2401.14196) 7B，超过一半数据来自 Common Crawl (CC) ，使用部分[OpenWebMath](https://arxiv.org/abs/2310.06786)作为正例部分CC作为负例，训练了一个[fastText model](https://arxiv.org/abs/1612.03651)，使用该模型从CC中提取 mathematical web pages ，还对提取的数据质量进行了验证（详见原文），SFT数据是经过领域和难度划分的，problems are paired with solutions 通过 chain-of-thought (CoT), [program-of-thought (PoT)](https://arxiv.org/abs/2211.12588), [tool-integrated reasoning format](https://arxiv.org/abs/2309.17452)，获得了776K的 training examples
 
 <p align = "center">
