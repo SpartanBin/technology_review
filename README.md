@@ -1,3 +1,5 @@
+***注意！因gitee和github的markdown公式代码不完全一样，本文写作时是以gitee为准的，所以github版会有公式无法渲染或渲染错误的情况，[gitee地址](https://gitee.com/spartanbin/technology_review)，[github地址](https://github.com/SpartanBin/technology_review)***
+
 # 评论&笔记
 
 - [Transformer (Google Brain, Google Research, 2017.6)](#202502021731)
