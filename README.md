@@ -691,7 +691,7 @@ $$
             s_{i, t}, s_{i, t} \sim Topk({s_{j, t} | K_s + 1 <= j <= mN}, mK - K_s), 
             0, otherwise, 
         \end{cases}
-    \right
+    \right.
 $$
 
 </div>
