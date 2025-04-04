@@ -695,7 +695,7 @@ $$ s_{i, t} = Softmax({u_t^l}^T \times e_i^l) $$
 $$ L_{ExpBal} = \alpha_1 \sum_{i=1}^{N^{\prime}} f_i P_i, N^{\prime} = mN - K_s $$
 $$ f_i = \frac{N^{\prime}}{K^{\prime} T} \sum_{t=1}^{T} \pmb{1}(t), K^{\prime} = mK - K_s $$
 $$ P_i = \frac{1}{T} \sum_{t=1}^{T} s_{i, t} $$
-$$ L_{DevBal} = \alpha_2 \sum_{i=1}^{D} f_i^{\prime} P_i^{\prime}, \quad groups: \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
+$$ L_{DevBal} = \alpha_2 \sum_{i=1}^{D} f_i^{\prime} P_i^{\prime}, {\kern 10pt} groups: \{ \epsilon_1, \epsilon_2, ..., \epsilon_D \} $$
 $$ f_i^{\prime} = \frac{1}{|\epsilon_i|} \sum_{j \sim \epsilon_i} f_j $$
 $$ P_i^{\prime} = \sum_{j \sim \epsilon_i} P_j $$
 
