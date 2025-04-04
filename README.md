@@ -685,13 +685,11 @@ $$ L_{load} = \alpha N \sum_{i=1}^{N} f_i P_i $$
 
 $$ h_t^l = \sum_{i=1}^{K_s} FFN_i(u_t^l) + \sum_{i=K_s+1}^{mN} \big( g_{i, t} FFN_i(u_t^l) \big) + u_t^l $$
 $$ 
-    g_{i, t} = 
-    \left\{
-        \begin{cases}
-            s_{i, t}, s_{i, t} \sim Topk({s_{j, t} | K_s + 1 <= j <= mN}, mK - K_s), \\
-            0, otherwise, 
-        \end{cases}
-    \right.
+    g_{i, t} =
+    \begin{cases}
+        s_{i, t}, s_{i, t} \sim Topk({s_{j, t} | K_s + 1 <= j <= mN}, mK - K_s), \\
+        0, otherwise, 
+    \end{cases}
 $$
 
 </div>
