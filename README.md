@@ -691,6 +691,7 @@ $$
         0, otherwise, 
     \end{cases}
 $$
+$$ s_{i, t} = Softmax({u_t^l}^T \times e_i^l) $$
 
 </div>
 
