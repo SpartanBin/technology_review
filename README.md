@@ -757,7 +757,23 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 </p>
 
 - DeepSeek-VL 是个vision language model，他处理的任务如上图1，是一张图片加一句提示词来给回答，不是视觉语言多轮对话任务，比较简单，数据混合了视觉语言数据和DeepSeek LLM用的纯语言数据（详见原文），模型由一个混合视觉编码器 (hybrid vision encoder)，一个视觉适配器 (vision adaptor) 和 语言模型 (language model) 组成，其中混合视觉编码器结构没讲清楚，只表明了使用两个预训练模型，一个 [SAM-B](https://arxiv.org/abs/2304.02643) 一个 SigLIP-L 没有给出引用，猜想是[该模型](https://arxiv.org/abs/2303.15343)，经过一些处理后，两个模型的输出会被连接在一起，视觉适配器就是MLP，语言模型就是DeepSeek LLM，训练包含三个阶段，如上图2，冰花表示冻结参数，火焰表示打开训练
-- DeepSeek-V2 是 MoE 模型，总大小236B，每个token激活21B，
+- DeepSeek-V2 是 MoE 模型，总大小236B，每个token激活21B，DeepSeek-V2 使用 Multi-head Latent Attention (MLA) 替换 GQA，用 DeepSeekMoE 的 MoE （替换 FFN ）
+
+<p align = "center">
+<img src=/img/deepseek_v2_mla.png width="800" />
+</p>
+
+- MLA 是为了解决 kv cache 占用太多储存空间的问题，MLA用了和lora一样的低秩矩阵分解的思想，先用一个下投影矩阵将 hidden states（就是MHA里需要乘以3个投影矩阵得到qkv的那个输入张量） 压缩成 low-rank key-value joint compression，就不需要储存kv cache了，存该压缩张量就行了，之后再有两个上投影矩阵将其恢复成kv就行了，只是需要注意的是这令 RoPE 变得不兼容，一般 k cache 是储存的经过RoPE后的k，然而在MLA中这显然不行（上图画的不准确，实际对q他们也用了低秩矩阵分解），为了防止每次恢复出k之后再带入算之前所有token算RoPE，他们提出了 Decoupled Rotary Position Embedding（对q也一样操作），简单来说就是准备了两份q和k，对于q来说，先压缩得到压缩张量（hidden states乘以q的下投影矩阵），对该张量分别乘以两个矩阵，一个得到不带位置信息的q，另一个再代入RoPE得到带位置信息的q，再concatenate，对于k来说，由hidden states乘以两个k的投影矩阵得到两个k，一个是下投影矩阵，得到的结果乘以2个上投影矩阵得到kv，另一个是一个独立的投影矩阵的，该结果再代入RoPE得到带位置信息的k（这一步和普通的RoPE对k的操作是一样的），然后concatenate，因此除了需要缓存kv压缩张量，还需要缓存带位置信息的k，注意为了使运算更快，那两个参与得到带位置信息的qk的投影矩阵投影的维度和下投影矩阵一样都很小
+
+<div align="center">
+
+$$ L_{CommBal} =  $$
+$$  $$
+$$  $$
+
+</div>
+
+- 在 DeepSeekMoE 的 MoE 基础上还增加了 Communication Balance Loss
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
