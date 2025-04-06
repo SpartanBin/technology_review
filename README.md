@@ -757,7 +757,7 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 </p>
 
 - DeepSeek-VL 是个vision language model，他处理的任务如上图1，是一张图片加一句提示词来给回答，不是视觉语言多轮对话任务，比较简单，数据混合了视觉语言数据和DeepSeek LLM用的纯语言数据（详见原文），模型由一个混合视觉编码器 (hybrid vision encoder)，一个视觉适配器 (vision adaptor) 和 语言模型 (language model) 组成，其中混合视觉编码器结构没讲清楚，只表明了使用两个预训练模型，一个 [SAM-B](https://arxiv.org/abs/2304.02643) 一个 SigLIP-L 没有给出引用，猜想是[该模型](https://arxiv.org/abs/2303.15343)，经过一些处理后，两个模型的输出会被连接在一起，视觉适配器就是MLP，语言模型就是DeepSeek LLM，训练包含三个阶段，如上图2，冰花表示冻结参数，火焰表示打开训练
-- DeepSeek-V2 是 MoE 模型，总大小236B，每个token激活21B，DeepSeek-V2 使用 Multi-head Latent Attention (MLA) 替换 GQA，用 DeepSeekMoE 的 MoE （替换 FFN ）
+- DeepSeek-V2 是 MoE 模型，总大小236B，每个token激活21B，DeepSeek-V2 使用 Multi-head Latent Attention (MLA) 替换 GQA，用 DeepSeekMoE 的 MoE （替换 FFN ），用了[YaRN](https://arxiv.org/abs/2309.00071)在初始预训练之后增长上下文窗口从4k到128k（详见YaRN论文）
 
 <p align = "center">
 <img src=/img/deepseek_v2_mla.png width="800" />
@@ -767,13 +767,14 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 
 <div align="center">
 
-$$ L_{CommBal} =  $$
-$$  $$
-$$  $$
+$$ L_{CommBal} = \alpha_3 \sum_{i=1}^{D} f_i^{\prime}^{\prime} P_i^{\prime}^{\prime} $$
+$$ f_i^{\prime}^{\prime} = \frac{D}{MT} \sum_{t=1}^{T} \pmb{1}(t) $$
+$$ P_i^{\prime}^{\prime} = \sum_{j \in \epsilon_i} P_j $$
 
 </div>
 
-- 在 DeepSeekMoE 的 MoE 基础上还增加了 Communication Balance Loss
+- DeepSeek-V2 在 DeepSeekMoE 的 MoE 基础上还增加了 Communication Balance Loss，M是设备数量，D是集群数量，T是token数量，1(t)是指示函数，当token t选择设备i时等于1否则为0，为了负载均衡，还使用了 Token-Dropping Strategy，这个方法是说设备在达到容量时会舍弃亲和力低的token，实在是无法理解token为什么能被舍弃
+- DeepSeek-V2 的RL阶段和DeepSeekMath一样，但是是Outcome Supervision RL with GRPO的设置，有两个阶段，第一个是 reasoning alignment stage，第二个是 human preference alignment stage，第一阶段只有一个奖励模型，收集训练奖励模型的数据code来自编译器，数学来自 ground-truth label，第二阶段有三个奖励模型helpful、safety和rule，他们会被人为赋予的权重并求和作为奖励，训练数据是人为精心收集，训练奖励模型不是Point-wise Loss就是Pair-wise Loss，point就是直接赋予数值然后算mse，pair就是InstructGPT的RM loss
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
