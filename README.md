@@ -775,7 +775,34 @@ $$ P_i^{\prime\prime} = \sum_{j \in \epsilon_i} P_j $$
 
 - DeepSeek-V2 在 DeepSeekMoE 的 MoE 基础上还增加了 Communication Balance Loss，M是设备数量，D是集群数量，T是token数量，1(t)是指示函数，当token t选择设备i时等于1否则为0，为了负载均衡，还使用了 Token-Dropping Strategy，这个方法是说设备在达到容量时会舍弃亲和力低的token，实在是无法理解token为什么能被舍弃
 - DeepSeek-V2 的RL阶段和DeepSeekMath一样，但是是Outcome Supervision RL with GRPO的设置，有两个阶段，第一个是 reasoning alignment stage，第二个是 human preference alignment stage，第一阶段只有一个奖励模型，收集训练奖励模型的数据code来自编译器，数学来自 ground-truth label，第二阶段有三个奖励模型helpful、safety和rule，他们会被人为赋予的权重并求和作为奖励，训练数据是人为精心收集，训练奖励模型不是Point-wise Loss就是Pair-wise Loss，point就是直接赋予数值然后算mse，pair就是InstructGPT的RM loss
-- DeepSeek-V3 的模型架构和 DeepSeek-V2 没有区别，在load balance上额外使用了 [auxiliary-loss-free load balancing strategy](https://arxiv.org/abs/2408.15664)， 
+
+<div align="center">
+
+$$ h_t^{\prime} = u_t + \sum_{i=1}^{N_s} FFN_i^{(s)}(u_t) + \sum_{i=1}^{N_r} g_{i, t} FFN_i^{(r)}(u_t) $$
+$$ g_{i, t} = \frac{g_{i, t}^{\prime}}{\sum_{j=1}^{N_r} g_{j, t}^{\prime}} $$
+$$ 
+    g_{i, t}^{\prime} =
+    \begin{cases}
+        s_{i, t}, s_{i, t} + b_i \in Topk( \{ s_{j, t} + b_j | 1 <= j <= N_r \}, K_r), \\
+        0, otherwise, 
+    \end{cases}
+$$
+$$ s_{i, t} = Sigmoid({u_t}^T \times e_i) $$
+
+</div>
+
+- DeepSeek-V3 的模型架构和 DeepSeek-V2 几乎没有区别，在load balance上额外使用了 [auxiliary-loss-free load balancing strategy](https://arxiv.org/abs/2408.15664)，改了MoE的专家亲和得分 (affinity scores)（他将g称为亲和得分）计算方式，主要是softmax改成sigmoid并进行了归一化，并在专家选择时加入bias（上式的b_i，这就是auxiliary-loss-free load balancing strategy技术），注意这个是不影响求和g的，只在选top k时使用，还有一个超参数 bias update speed gamma，在每一步结束时，overloaded的expert的bias会减去gamma，underloaded的会加，比起V2的很多辅助损失 (auxiliary loss)，V3仅有一个辅助损失 Complementary Sequence-Wise Auxiliary Loss，如下式，1(t)是指示函数，当token t选择专家i时等于1否则为0
+
+<div align="center">
+
+$$ L_{Bal} = \alpha \sum_{i=1}^{N_r} f_i P_i $$
+$$ f_i = \frac{N_r}{K_r T} \sum_{t=1}^{T} \pmb{1}(t) $$
+$$ P_i = \frac{1}{T} \sum_{t=1}^{T} s_{i, t}^{\prime} $$
+$$ s_{i, t}^{\prime} = \frac{s_{i, t}}{\sum_{j=1}^{N_r} s_{j, t}} $$
+
+</div>
+
+- DeepSeek-V3 使用了 Node-Limited Routing 技术，在 MoE 模型中，每个 token 会被路由到多个专家（expert），而这些专家往往分布在不同的计算节点上，如果一个 token 被路由到过多的节点，会导致大量的跨节点数据交换，严重拖慢训练速度，Node-Limited Routing 确保每个 token 只会被发送到有限数量的节点（例如，最多 4 个节点），具体来说，系统会根据分布在各节点上的专家的亲和分数（affinity scores），为每个 token 计算出每个节点的总亲和分数，并只选择总分最高的几个节点进行路由，这样可以大幅减少跨节点通信，从而实现计算与通信的重叠，极大提高了训练效率（GPT回答的），这个技术V2也用了，只是V2是限制设备，所以在V2里叫 Device-Limited Routing（在V2里漏写了），***只是这里就产生疑问了，所以是先限制了节点（设备）的选择，再选top k专家吗？*** V3没有使用 Token-Dropping Strategy
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
