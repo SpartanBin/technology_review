@@ -767,7 +767,7 @@ $$ \widetilde{r}_i^{index(j)} = \frac{r_i^{index(j)} - mean(\pmb{r})}{std(\pmb{r
 
 <div align="center">
 
-$$ L_{CommBal} = \alpha_3 \sum_{i=1}^{D} f_i^{\prime}^{\prime} P_i^{\prime}^{\prime} $$
+$$ L_{CommBal} = \alpha_3 \sum_{i=1}^{D} {f_i^{\prime}}^{\prime} {P_i^{\prime}}^{\prime} $$
 $$ f_i^{\prime}^{\prime} = \frac{D}{MT} \sum_{t=1}^{T} \pmb{1}(t) $$
 $$ P_i^{\prime}^{\prime} = \sum_{j \in \epsilon_i} P_j $$
 
