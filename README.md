@@ -802,7 +802,7 @@ $$ s_{i, t}^{\prime} = \frac{s_{i, t}}{\sum_{j=1}^{N_r} s_{j, t}} $$
 
 </div>
 
-- DeepSeek-V3 使用了 Node-Limited Routing 技术，在 MoE 模型中，每个 token 会被路由到多个专家（expert），而这些专家往往分布在不同的计算节点上，如果一个 token 被路由到过多的节点，会导致大量的跨节点数据交换，严重拖慢训练速度，Node-Limited Routing 确保每个 token 只会被发送到有限数量的节点（例如，最多 4 个节点），具体来说，系统会根据分布在各节点上的专家的亲和分数（affinity scores），为每个 token 计算出每个节点的总亲和分数，并只选择总分最高的几个节点进行路由，这样可以大幅减少跨节点通信，从而实现计算与通信的重叠，极大提高了训练效率（GPT回答的），这个技术V2也用了，只是V2是限制设备，所以在V2里叫 Device-Limited Routing（在V2里漏写了），***只是这里就产生疑问了，所以是先限制了节点（设备）的选择，再选top k专家吗？*** V3没有使用 Token-Dropping Strategy
+- DeepSeek-V3 使用了 Node-Limited Routing 技术，在 MoE 模型中，每个 token 会被路由到多个专家（expert），而这些专家往往分布在不同的计算节点上，如果一个 token 被路由到过多的节点，会导致大量的跨节点数据交换，严重拖慢训练速度，Node-Limited Routing 确保每个 token 只会被发送到有限数量的节点（例如，最多 4 个节点），具体来说，系统会根据分布在各节点上的专家的亲和分数（affinity scores），为每个 token 计算出每个节点的总亲和分数，并只选择总分最高的几个节点进行路由，这样可以大幅减少跨节点通信，从而实现计算与通信的重叠，极大提高了训练效率（GPT说的），这个技术V2也用了，只是V2是限制设备，所以在V2里叫 Device-Limited Routing（在V2里漏写了），***只是这里就产生疑问了，所以是先限制了节点（设备）的选择，再选top k专家吗？*** V3没有使用 Token-Dropping Strategy
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
