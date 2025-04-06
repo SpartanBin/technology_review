@@ -775,6 +775,7 @@ $$ P_i^{\prime\prime} = \sum_{j \in \epsilon_i} P_j $$
 
 - DeepSeek-V2 在 DeepSeekMoE 的 MoE 基础上还增加了 Communication Balance Loss，M是设备数量，D是集群数量，T是token数量，1(t)是指示函数，当token t选择设备i时等于1否则为0，为了负载均衡，还使用了 Token-Dropping Strategy，这个方法是说设备在达到容量时会舍弃亲和力低的token，实在是无法理解token为什么能被舍弃
 - DeepSeek-V2 的RL阶段和DeepSeekMath一样，但是是Outcome Supervision RL with GRPO的设置，有两个阶段，第一个是 reasoning alignment stage，第二个是 human preference alignment stage，第一阶段只有一个奖励模型，收集训练奖励模型的数据code来自编译器，数学来自 ground-truth label，第二阶段有三个奖励模型helpful、safety和rule，他们会被人为赋予的权重并求和作为奖励，训练数据是人为精心收集，训练奖励模型不是Point-wise Loss就是Pair-wise Loss，point就是直接赋予数值然后算mse，pair就是InstructGPT的RM loss
+- DeepSeek-V3 的模型架构和 DeepSeek-V2 没有区别，在load balance上额外使用了 [auxiliary-loss-free load balancing strategy](https://arxiv.org/abs/2408.15664)， 
 
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
