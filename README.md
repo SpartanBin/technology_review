@@ -791,7 +791,7 @@ $$ s_{i, t} = Sigmoid({u_t}^T \times e_i) $$
 
 </div>
 
-- DeepSeek-V3 的模型架构和 DeepSeek-V2 几乎没有区别，在load balance上额外使用了 [auxiliary-loss-free load balancing strategy](https://arxiv.org/abs/2408.15664)，改了MoE的专家亲和得分 (affinity scores)（他将g称为亲和得分）计算方式，主要是softmax改成sigmoid并进行了归一化，并在专家选择时加入bias（上式的b_i，这就是auxiliary-loss-free load balancing strategy技术），注意这个是不影响求和g的，只在选top k时使用，还有一个超参数 bias update speed gamma，在每一步结束时，overloaded的expert的bias会减去gamma，underloaded的会加，比起V2的很多辅助损失 (auxiliary loss)，V3仅有一个辅助损失 Complementary Sequence-Wise Auxiliary Loss，如下式，1(t)是指示函数，当token t选择专家i时等于1否则为0
+- DeepSeek-V3 和 DeepSeek-V2 有一些区别，在load balance上额外使用了 [auxiliary-loss-free load balancing strategy](https://arxiv.org/abs/2408.15664)，改了MoE的专家亲和得分 (affinity scores)（他将g称为亲和得分）计算方式，主要是softmax改成sigmoid并进行了归一化，并在专家选择时加入bias（上式的b_i，这就是auxiliary-loss-free load balancing strategy技术），注意这个是不影响求和g的，只在选top k时使用，还有一个超参数 bias update speed gamma，在每一步结束时，overloaded的expert的bias会减去gamma，underloaded的会加，比起V2的很多辅助损失 (auxiliary loss)，V3仅有一个辅助损失 Complementary Sequence-Wise Auxiliary Loss，如下式，1(t)是指示函数，当token t选择专家i时等于1否则为0
 
 <div align="center">
 
