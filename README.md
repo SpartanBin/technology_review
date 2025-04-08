@@ -804,6 +804,20 @@ $$ s_{i, t}^{\prime} = \frac{s_{i, t}}{\sum_{j=1}^{N_r} s_{j, t}} $$
 
 - DeepSeek-V3 使用了 Node-Limited Routing 技术，在 MoE 模型中，每个 token 会被路由到多个专家（expert），而这些专家往往分布在不同的计算节点上，如果一个 token 被路由到过多的节点，会导致大量的跨节点数据交换，严重拖慢训练速度，Node-Limited Routing 确保每个 token 只会被发送到有限数量的节点（例如，最多 4 个节点），具体来说，系统会根据分布在各节点上的专家的亲和分数（affinity scores），为每个 token 计算出每个节点的总亲和分数，并只选择总分最高的几个节点进行路由，这样可以大幅减少跨节点通信，从而实现计算与通信的重叠，极大提高了训练效率（GPT说的），这个技术V2也用了，只是V2是限制设备，所以在V2里叫 Device-Limited Routing（在V2里漏写了），***只是这里就产生疑问了，所以是先限制了节点（设备）的选择，再选top k专家吗？*** V3没有使用 Token-Dropping Strategy
 
+<p align = "center">
+<img src=/img/deepseek_v3_multitokenprediction.png width="800" />
+</p>
+
+- DeepSeek-V3 使用了 Multi-Token Prediction 技术，该技术源于[论文](https://arxiv.org/abs/2404.19737)，原 Multi-Token Prediction 论文是4 tokens target，DeepSeek-V3没说，但看上图应该也是4个，图画的很清晰，最终loss就是图中 L_MTP_1, L_MTP_2, ... 等MTP loss取平均值再乘一个lambda权重，再与L_main求和，L_main就是普通的next token prediction loss，L_MTP_k就是负对数概率取平均
+
+<p align = "center">
+<img src=/img/deepseek_v3_mixedprecisionframework.png width="800" />
+</p>
+
+- DeepSeek-V3 的计算设施和并行策略详见原文3.1，3.2章节，DeepSeek-V3 还是用了带有 FP8 的 Mixed Precision Framework，上图是 Linear operator 的计算流程，总的来说 most compute-density operations are conducted in FP8, while a few key operations are strategically maintained in their original data formats 以及一些其他的提升精度的方法，和一套针对高性价比ai设施的建议方案（详见原文章节3后续）
+- DeepSeek-V3 的预训练数据处理包括处理冗余，检查完整性以得到高质量数据，对10%的数据使用 Prefix-Suffix-Middle (PSM) framework，以及使用特殊token，SFT 写的感觉不清楚，SFT 和 RL 阶段似乎是混合进行的，Reasoning Data 的few-shot部分是 DeepSeek-R1 生成的（但是DeepSeek-R1却比V3晚发布...），为了平衡R1的高正确率和回答的简洁性和规范化，他们训练了专家模型去生成数据，包含原始回答和R1回答，专家模型给V3生成数据，让V3学会两种回答风格，RL包含两种奖励模型，rule-base和model-base，rule就是数学问题和代码问题，数学可以看其最终答案是否正确，代码可以用编译器验证，model就是其他问题，V3和V2一样，没有过程奖励，只有最终奖励
+- DeepSeek-R1 
+
 ## <span id="202502151055"> Flamingo </span>
 - DeepMind, 2022.4
 - Flamingo: a Visual Language Model for Few-Shot Learning
