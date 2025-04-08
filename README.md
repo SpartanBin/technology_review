@@ -821,7 +821,7 @@ $$ s_{i, t}^{\prime} = \frac{s_{i, t}}{\sum_{j=1}^{N_r} s_{j, t}} $$
 <img src=/img/deepseek_r1_template.png width="800" />
 </p>
 
-- DeepSeek-R1 都是从 DeepSeek-V3-Base 训练得到的，训练 DeepSeek-R1-Zero 没有使用SFT（冷启动）数据，只是zero有 poor readability, and language mixing 等问题，所以他们又推出了加上SFT并经过两轮训练的 DeepSeek-R1（请问这和V3有什么区别...），训练zero连 neural reward model 都没有用，就只用了像V3一样的rule-base奖励（数学和代码），以及格式奖励，就是让模型用[think]...[/think]特殊token将思考过程包起来[answer]...[/answer]包回答，然后奖励也不是过程奖励，是只奖励最终答案，然后模型都是按以上模板提示的，随着训练进行，推理时长会增加很多（几百到12000），训练R1是为了解决两个疑问：1.通过将少量高质量数据纳入冷启动，可以进一步提高推理性能或加速收敛吗，2.我们如何训练一个用户友好的模型，该模型不仅产生清晰且连贯的思维链，而且还表现出强大的通用能力
+- DeepSeek-R1 都是从 DeepSeek-V3-Base 训练得到的，训练 DeepSeek-R1-Zero 没有使用SFT（冷启动）数据，只是zero有 poor readability, and language mixing 等问题，所以他们又推出了加上SFT并经过两轮训练的 DeepSeek-R1，训练zero连 neural reward model 都没有用，就只用了像V3一样的rule-base奖励（数学和代码），以及格式奖励，就是让模型用[think]...[/think]特殊token将思考过程包起来[answer]...[/answer]包回答，然后奖励也不是过程奖励，是只奖励最终答案，然后模型都是按以上模板提示的，随着训练进行，推理时长会增加很多（几百到12000），训练R1是为了解决两个疑问：1.通过将少量高质量数据纳入冷启动，可以进一步提高推理性能或加速收敛吗，2.我们如何训练一个用户友好的模型，该模型不仅产生清晰且连贯的思维链，而且还表现出强大的通用能力
 - DeepSeek-R1 是两阶段的 SFT + RL 训练，首先收集了一些模型生成人类修改的冷启动CoT数据，这些数据必须具备可读性并符合人类先验模式（不理解什么意思），然后利用zero的训练方式训练RL并额外提供 language consistency reward，第二阶段收集了书写，角色扮演和其他通用任务中的数据和其他非推理数据（有些问题不需要思考就能回答，比如和你打招呼等）并加上 rejection sampling 进行训练，也用了 neural reward model 并用 Pair-wise Loss 训练，也针对 helpfulness and harmlessness 进行了训练
 
 ## <span id="202502151055"> Flamingo </span>
