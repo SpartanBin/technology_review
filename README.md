@@ -1,6 +1,6 @@
 ***注意！因gitee和github的markdown公式代码不完全一样，本文写作时是以gitee为准的，所以github版会有公式无法渲染或渲染错误的情况，[gitee地址](https://gitee.com/spartanbin/technology_review)，[github地址](https://github.com/SpartanBin/technology_review)***
 
-# 评论&笔记
+# 大模型
 
 - [Transformer (Google Brain, Google Research, 2017.6)](#202502021731)
 - [BERT (Google AI Language, 2018.10)](#202502021732)
@@ -44,6 +44,13 @@
 - [HunyuanVideo (Tencent Hunyuan, 2024.12)](#202502021754)
 - [Stanford Town (Stanford University, 2023.4)](#202503021548)
 - [QAT](#202503021530)
+
+# 强化学习
+
+- [DQN (DeepMind, 2013.12)](#202505262258)
+- [DDPG (DeepMind, 2015.9)](#202505262300)
+- [TD3 (McGill University, 2018.2)](#202505262304)
+- [SAC (UC Berkeley, 2018.12)](#202505262308)
 
 ## <span id="202502021731"> Transformer </span>
 - Google Brain, Google Research, 2017.6
@@ -1074,3 +1081,27 @@ $$ \pi^{\prime} = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(
 - QAT是一种在模型训练过程中就考虑量化效应的方法，其主要思想在于让网络在训练时模拟低精度运算，从而提高量化后模型的性能
 - 在forward中就模拟量化（近似量化后的值），让网络在前向传播时体验低精度计算的影响
 - 在反向传播中近似梯度，由于量化操作通常是非可微的，所以可以用STE近似
+
+## <span id="202505262258"> DQN </span>
+- DeepMind, 2013.12
+- Playing Atari with Deep Reinforcement Learning
+- 2年后 2015.2 发了 Nature, Human-level control through deep reinforcement learning
+- DQN 简单来说有点像是把强化学习算法（非深度强化学习算法）的 q-learning 的值估计器改成了神经网络，在更新神经网络权重时使用经验回放机制 (experience replay, memory replay)，DQN的loss如下
+
+<div align="center">
+
+$$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_{\theta_{old}}(s^{\prime})) - Q(s | a) \big)^2 \big] $$
+
+</div>
+
+## <span id="202505262300"> DDPG </span>
+- DeepMind, 2015.9
+- Continuous control with deep reinforcement learning
+
+## <span id="202505262304"> TD3 </span>
+- McGill University, 2018.2
+- Addressing Function Approximation Error in Actor-Critic Methods
+
+## <span id="202505262308"> SAC </span>
+- UC Berkeley, 2018.12
+- Soft Actor-Critic Algorithms and Applications
