@@ -1086,13 +1086,15 @@ $$ \pi^{\prime} = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(
 - DeepMind, 2013.12
 - Playing Atari with Deep Reinforcement Learning
 - 2年后 2015.2 发了 Nature, Human-level control through deep reinforcement learning
-- DQN 简单来说有点像是把强化学习算法（非深度强化学习算法）的 q-learning 的值估计器改成了神经网络，在更新神经网络权重时使用经验回放机制 (experience replay, memory replay)，DQN的loss如下
+- DQN 简单来说有点像是把强化学习算法（非深度强化学习算法）的 q-learning 的值估计器改成了神经网络，在更新神经网络权重时使用经验回放机制 (experience replay, memory replay)，DQN的loss如下，其中s'是下一个时间步的状态，theta_old表示旧的Q估计器参数（这本来是target net，但是是不直接训练他的，会定期更新成actor net的参数，更新方式可以是软更新的方式 Polyak update），max(Q_theta_old(s'))表示取下一个时间步所有动作的Q预测值的最大值
 
 <div align="center">
 
 $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_{\theta_{old}}(s^{\prime})) - Q(s | a) \big)^2 \big] $$
 
 </div>
+
+- 探索策略还是经典的带噪声的贪心策略
 
 ## <span id="202505262300"> DDPG </span>
 - DeepMind, 2015.9
