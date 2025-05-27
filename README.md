@@ -49,6 +49,7 @@
 
 - [DQN (DeepMind, 2013.12)](#202505262258)
 - [DDPG (DeepMind, 2015.9)](#202505262300)
+- [Double DQN (DeepMind, 2015.9)](#202505272217)
 - [TD3 (McGill University, 2018.2)](#202505262304)
 - [SAC (UC Berkeley, 2018.12)](#202505262308)
 
@@ -1099,6 +1100,11 @@ $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_
 ## <span id="202505262300"> DDPG </span>
 - DeepMind, 2015.9
 - Continuous control with deep reinforcement learning
+
+## <span id="202505272217"> Double DQN </span>
+- DeepMind, 2015.9
+- Deep Reinforcement Learning with Double Q-learning
+- DQN 有一个缺陷就是预测的 Q 值会无限 overestimate, Double DQN 就是在解决该问题，Double DQN 与原 DQN 唯一的区别就是替换 max(Q_theta_old(s')) 为 Q_theta_old(s', argmax(Q_theta(s'))), 也就是原本 next state 的动作（Q值最大的动作）是 Q_theta_old 自己选出的，现在由 Q_theta 选出，但是却由 Q_theta_old 估值
 
 ## <span id="202505262304"> TD3 </span>
 - McGill University, 2018.2
