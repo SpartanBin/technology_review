@@ -1104,7 +1104,7 @@ $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_
 
 <div align="center">
 
-$$ \underset{\mathcal{Max}}{\theta} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big( s, \mu_{\theta}(s) \big) \big] $$
+$$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big( s, \mu_{\theta}(s) \big) \big] $$
 
 </div>
 
