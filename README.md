@@ -51,7 +51,7 @@
 - [DDPG (DeepMind, 2015.9)](#202505262300)
 - [Double DQN (DeepMind, 2015.9)](#202505272217)
 - [TD3 (McGill University, 2018.2)](#202505262304)
-- [SAC (UC Berkeley, 2018.12)](#202505262308)
+- [SAC (UC Berkeley, 2018.1, 2018.12)](#202505262308)
 
 ## <span id="202502021731"> Transformer </span>
 - Google Brain, Google Research, 2017.6
@@ -1100,6 +1100,15 @@ $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_
 ## <span id="202505262300"> DDPG </span>
 - DeepMind, 2015.9
 - Continuous control with deep reinforcement learning
+- DDPG 方法可以粗略地认为是 DQN 和 [DPG (Deterministic Policy Gradient)](https://proceedings.mlr.press/v32/silver14.pdf) 算法的结合，DDPG (Deep DPG)，DPG 证明了其优化目标为 stochastic policy gradient 在高斯噪声退化为零的特例或极限形式，其方差相对于 stochastic policy gradient 更低（GPT说的），DDPG的策略优化目标如下，注意 Q_phi 在这里是不参与梯度下降的，它相当于是像MSE一样的评价函数，从这个角度看DDPG真的很像训练回归模型
+
+<div align="center">
+
+$$ \mathcal{MAX}_{\theta} E_{s \sim D} \big[ Q_{\phi} \big( s, \mu_{\theta}(s) \big) \big] $$
+
+</div>
+
+- DDPG 可以说就是 DQN 的 Actor Critic 版本，行动网络 (actor net) 是由 actor 和 critic 两个模型组成的，目标网络 (target net) 也是，训练时先由目标网络的actor选出next state的动作，再由目标网络的critic评估，然后得到行动网络的critic的优化目标去优化行动网络的critic，然后再用行动网络的critic优化行动网络的actor，然后再像 DQN 一样定期copy行动网络模型参数给目标网络（一样可以是软更新）
 
 ## <span id="202505272217"> Double DQN </span>
 - DeepMind, 2015.9
@@ -1109,7 +1118,11 @@ $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_
 ## <span id="202505262304"> TD3 </span>
 - McGill University, 2018.2
 - Addressing Function Approximation Error in Actor-Critic Methods
+- TD3 是对 DDPG 的改进，TD3 又叫 Twin Delayed DDPG，DDPG 存在以下问题：1.对超参数十分敏感，2.和 DQN 一样会 overestimate Q 值，3.Q值预测会有 incorrect sharp peak for some actions, the policy will quickly exploit that peak and then have brittle or incorrect behavior
+- TD3 的改进也是三点：1. Clipped Double-Q Learning, 2. “Delayed” Policy Updates, 3. Target Policy Smoothing, 1、2都是为了解决问题2（问题1没解决），3是为了解决问题3，1是用了两个critic（行动网络和目标网络都是，当然实际实现还可以加量），在预测next state q value时用两个（目标网络的）critic中相对较小的那个，训练critic两个正常分开训练，评价（行动网络的）动作价值固定用第一个critic，2是训练actor参数次数小于训练critic，比如训练2次critic才训练一次actor（当然更新目标网络参数也和训练actor的频率一致了），3是在预测next state q value时，在目标网络actor选择动作时加入了噪声，这是源于一个假设认为相似的动作应该赋予相近的 q 值，这样就起到了平滑作用
 
 ## <span id="202505262308"> SAC </span>
-- UC Berkeley, 2018.12
+- UC Berkeley, 2018.1, 2018.12
+- Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
 - Soft Actor-Critic Algorithms and Applications
+- SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II
