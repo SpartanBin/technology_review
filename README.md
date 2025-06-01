@@ -1123,7 +1123,7 @@ $$ V_t = Q_t $$
 
 <div align="center">
 
-$$ V_t = E(Q_t + H) = E(Q_t) + E(H) $$
+$$ V_t = E(Q_t + H_t) = E(Q_t) + E(H_t) $$
 
 </div>
 
