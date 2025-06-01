@@ -1136,7 +1136,7 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E [\underset{j = 1, 2}{min} {\ke
 </div>
 
 - SAC也用了Clipped Double-Q Learning，从上式可以看出，和TD3是一样的，SAC结合了Double DQN的思想，只有一个actor，就是没有目标网络的actor，所以选next state的action时是由行动网络的actor来选（这里有一点争议，如果是按DQN, DDPG来就应该是直接选概率最大的，[stable-baseline3](https://github.com/DLR-RM/stable-baselines3)就是这样实现的，如果是考虑TD3的Target Policy Smoothing，就应该采样，[OpenAI Spinning Up](https://github.com/openai/spinningup)是这样实现的），除以上和熵以及采样之外SAC与DDPG无区别，SAC的熵不是直接使用像PPO一样的 Shannon entropy（香农熵），而是使用香农熵的蒙特卡洛无偏估计，就是直接取概率对数的负值
-- SAC (SAC I) 在发布后存在熵loss的系数alpha难调的困境，所以又发了一篇论文 (SAC II)，这篇文章把系数alpha设置成了会动态调整的情况，公式如下，注意当前的熵值 -log(a | s) 是不带梯度的，模型参数不会随该loss进行梯度下降，他只是提供一个数值，这个自动调整目标可以理解成让当前熵逼近目标熵（人工设置，应注意目标熵应该是负数），大于就降低系数，小于就增大系数，大部分框架都设置了一个目标熵的默认阈值，就等于 - action_dim，这就简单等于标准正态分布，相当于希望鼓励模型一直保持标准正态分布的探索模式
+- SAC (SAC I) 在发布后存在熵loss的系数alpha难调的困境，所以又发了一篇论文 (SAC II)，这篇文章把系数alpha设置成了会动态调整的情况，公式如下（省略了期望E），注意当前的熵值 -log(a | s) 是不带梯度的，模型参数不会随该loss进行梯度下降，他只是提供一个数值，这个自动调整目标可以理解成让当前熵逼近目标熵（人工设置，应注意目标熵应该是负数），大于就降低系数，小于就增大系数，大部分框架都设置了一个目标熵的默认阈值，就等于 - action_dim，这就简单等于标准正态分布，相当于希望鼓励模型一直保持标准正态分布的探索模式
 
 <div align="center">
 
