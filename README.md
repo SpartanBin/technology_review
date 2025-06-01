@@ -1089,7 +1089,7 @@ $$ \pi^{\prime} = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(
 
 <div align="center">
 
-$$ Q_t = r + V_(t + 1) $$
+$$ Q_t = r + V_{t + 1} $$
 
 </div>
 
