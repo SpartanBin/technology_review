@@ -1130,6 +1130,6 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 
 <div align="center">
 
-$$ \underset{\pi}{\mathcal{Max}} {\kern 5pt} \sum_t E{(s_t, a_t) \sim \rho_{\pi}} \big[ r(s_t, a_t) + \alpha \mathcal{H} \big( \pi(s_t) \big) \big] $$
+$$ \underset{\pi}{\mathcal{Max}} {\kern 5pt} \sum_t E_{(s_t, a_t) \sim \rho_{\pi}} \big[ r(s_t, a_t) + \alpha \mathcal{H} \big( \pi(s_t) \big) \big] $$
 
 </div>
