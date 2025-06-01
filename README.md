@@ -1125,4 +1125,11 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 - UC Berkeley, 2018.1, 2018.12
 - Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
 - Soft Actor-Critic Algorithms and Applications
-- SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II
+- SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II，以下是将两篇文章的方法论混在一起讲，不区别，因为现在主流的框架实现都只有一个融合了小改进的SAC算法
+- SAC 也是像 DDPG 一样的 off-policy actor critic，但是SAC是类似A2C一样的 stochastic policy 而不是 DDPG 类似的 deterministic policy，SAC不是用的DDPG, A2C类似的 [policy iteration 理论](https://en.wikipedia.org/wiki/Markov_decision_process#Policy_iteration)，他用的是 soft policy iteration 理论，不同于强化学习常用的最大化累积回报优化目标，它的优化目标是 [maximum entropy objective](https://www.cs.cmu.edu/~bziebart/publications/thesis-bziebart.pdf)
+
+<div align="center">
+
+$$ \underset{\pi}{\mathcal{Max}} {\kern 5pt} \sum_t E{(s_t, a_t) \sim \rho_{\pi}} \big[ r(s_t, a_t) + \alpha \mathcal{H} \big( \pi(s_t) \big) \big] $$
+
+</div>
