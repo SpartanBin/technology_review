@@ -1119,7 +1119,7 @@ $$ V_t = Q_t $$
 
 </div>
 
-- SAC 因为加入了熵到优化目标中，所以认为状态价值等于状态动作价值与状态熵 H 之和的期望，如下所示
+- SAC 因为加入了熵到优化目标中，所以认为状态价值等于状态动作价值与状态熵 H 之和的期望，等价于状态动作价值期望与状态熵期望之和，如下所示
 
 <div align="center">
 
@@ -1179,7 +1179,7 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E [\underset{j = 1, 2}{min} {\ke
 
 </div>
 
-- SAC也用了Clipped Double-Q Learning，从上式可以看出，和TD3是一样的，SAC或许借鉴了Double DQN的思想，只有一个actor，就是没有目标网络的actor，所以选next state的action时是由行动网络的actor采样得到（注意SAC认为状态价值等于状态动作价值与状态熵之和的期望，这里的采样正是‘期望’的体现），除以上及熵、采样之外SAC与DDPG无区别，SAC的熵不是直接使用像PPO一样的 Shannon entropy（香农熵），而是使用香农熵的蒙特卡洛无偏估计，就是直接取动作概率对数的负值（这也正是‘期望’的体现，因为采样出动作和概率挂钩，然后取动作的概率对数负值）
+- SAC也用了Clipped Double-Q Learning，从上式可以看出，和TD3是一样的，SAC或许借鉴了Double DQN的思想，只有一个actor，就是没有目标网络的actor，所以选next state的action时是由行动网络的actor采样得到（注意SAC认为状态价值等于状态动作价值期望与状态熵期望之和，这里的采样正是‘状态动作价值期望’的体现），除以上及熵、采样之外SAC与DDPG无区别，SAC的熵不是直接使用像PPO一样的 Shannon entropy（香农熵），而是使用香农熵的蒙特卡洛无偏估计，就是直接取动作概率对数的负值（这也正是‘状态熵期望’的体现）
 - SAC (SAC I) 在发布后存在熵loss的系数alpha难调的困境，所以又发了一篇论文 (SAC II)，这篇文章把系数alpha改为可自动调整，公式如下（省略了期望E），注意当前的熵值 -log(a | s) 不带梯度，alpha在用于策略优化目标，critic目标函数时也不带梯度，以下公式可以理解成让当前熵逼近目标熵（人工设置，应注意目标熵是负数），大于就降低系数，小于就增大系数，大部分框架都设置了一个目标熵的默认阈值等于 - action_dim，可简单近似为标准差为1的高斯分布（SAC的policy输出和DDPG一样会经过tanh缩放至-1到1的范围，因此可以认为希望鼓励模型一直保持标准正态分布的探索模式）
 
 <div align="center">
