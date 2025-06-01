@@ -47,6 +47,7 @@
 
 # 强化学习
 
+- [Knowledge Review](#202506020019)
 - [DQN (DeepMind, 2013.12)](#202505262258)
 - [DDPG (DeepMind, 2015.9)](#202505262300)
 - [Double DQN (DeepMind, 2015.9)](#202505272217)
@@ -1083,6 +1084,50 @@ $$ \pi^{\prime} = \frac{1}{s \sqrt{2 \pi}} \frac{1}{t(1 - t)} exp \big( -\frac{(
 - 在forward中就模拟量化（近似量化后的值），让网络在前向传播时体验低精度计算的影响
 - 在反向传播中近似梯度，由于量化操作通常是非可微的，所以可以用STE近似
 
+## <span id="202506020019"> Knowledge Review </span>
+- 这里要先回顾一下适用于强化学习的贝尔曼方程 ([Bellman equation](https://en.wikipedia.org/wiki/Bellman_equation))，写的不太严谨，旨在传达意思
+
+<div align="center">
+
+$$ Q_t = r + V_(t + 1) $$
+
+</div>
+
+- 上式表示当前状态的状态动作价值 Q_t 等于奖励 r 加上下一个状态的状态价值 V_(t + 1)，该式子是一个一般规律，在所有强化学习算法中都适用
+- 撇开 model-base, model-free, on-policy, off-policy 等其他方面不谈，各强化学习算法的不同就在于对状态价值 V 的定义
+- 一般情况下，如果不单独提，都是默认状态价值等于状态动作价值的期望（注意期望是概率乘以数值之和）, 如下所示
+
+<div align="center">
+
+$$ V_t = E(Q_t) $$
+
+</div>
+
+- 三大 V 不同定义的典型就是 DQN, DDPG, SAC
+- DQN继承自q-learning，因为总是假设能执行最优动作，所以认为状态价值等于最大的状态动作价值，如下所示
+
+<div align="center">
+
+$$ V_t = \mathcal{Max} (Q_t) $$
+
+</div>
+
+- DDPG 因为是确定性动作，也就是一个状态只有一个动作可执行，甚至都摒弃了‘概率’，所以认为状态价值等于状态动作价值，如下所示
+
+<div align="center">
+
+$$ V_t = Q_t $$
+
+</div>
+
+- SAC 因为加入了熵到优化目标中，所以认为状态价值等于状态动作价值与状态熵 H 之和的期望，如下所示
+
+<div align="center">
+
+$$ V_t = E(Q_t + H) = E(Q_t) + E(H) $$
+
+</div>
+
 ## <span id="202505262258"> DQN </span>
 - DeepMind, 2013.12
 - Playing Atari with Deep Reinforcement Learning
@@ -1143,3 +1188,5 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E [\underset{j = 1, 2}{min} {\ke
 $$ \underset{\alpha}{\mathcal{Min}} {\kern 5pt} \alpha [ -log \pi(a | s) - \mathcal{H}_{target}] $$
 
 </div>
+
+- DDPG, TD3, SAC 原本都是针对连续动作空间的环境，但SAC也有离散的版本，可以参考[论文](https://arxiv.org/abs/1910.07207)，
