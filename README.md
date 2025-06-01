@@ -1144,7 +1144,7 @@ $$ L(\theta) = E_{(s, a, r, s^{\prime}) \sim U(D)} \big[ \big( r + \gamma max(Q_
 ## <span id="202505262300"> DDPG </span>
 - DeepMind, 2015.9
 - Continuous control with deep reinforcement learning
-- DDPG 方法可以粗略地认为是 DQN 和 [DPG (Deterministic Policy Gradient)](https://proceedings.mlr.press/v32/silver14.pdf) 算法的结合，DDPG (Deep DPG)，DPG 证明了其优化目标为 stochastic policy gradient 在高斯噪声退化为零的特例或极限形式，其方差相对于 stochastic policy gradient 更低（GPT说的），DDPG的策略优化目标如下，注意 Q_phi 在这里是不参与梯度下降的，它相当于是像MSE一样的评价函数，从这个角度看DDPG真的很像训练回归模型
+- DDPG 改进自 [DPG (Deterministic Policy Gradient)](https://proceedings.mlr.press/v32/silver14.pdf), DDPG (Deep DPG)，DPG 证明了其优化目标为 stochastic policy gradient 在高斯噪声退化为零的特例或极限形式，其方差相对于 stochastic policy gradient 更低（GPT说的），DDPG的策略优化目标如下，注意 Q_phi 在这里是不参与梯度下降的，它相当于是像MSE一样的评价函数，从这个角度看DDPG真的很像训练回归模型
 
 <div align="center">
 
@@ -1152,7 +1152,7 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 
 </div>
 
-- DDPG 可以说就是 DQN 的 Actor Critic 版本，行动网络 (actor net) 是由 actor 和 critic 两个模型组成的，目标网络 (target net) 也是，训练时先由目标网络的actor选出next state的动作，再由目标网络的critic评估，然后得到行动网络的critic的优化目标去优化行动网络的critic，然后再用行动网络的critic优化行动网络的actor，然后再像 DQN 一样定期copy行动网络模型参数给目标网络（一样可以是软更新）
+- DDPG也借鉴了在DQN中被验证有效的经验回放机制和分离的的行动网络与目标网络，从实现的角度看DDPG真的很像 DQN 的 Actor Critic 版本，行动网络 (actor net) 是由 actor 和 critic 两个模型组成的，目标网络 (target net) 也是，训练时先由目标网络的actor选出next state的动作，再由目标网络的critic评估，然后得到行动网络的critic的优化目标去优化行动网络的critic，然后再用行动网络的critic优化行动网络的actor，然后再像 DQN 一样定期copy行动网络模型参数给目标网络（这里是必使用软更新，copy指软更新）
 
 ## <span id="202505272217"> Double DQN </span>
 - DeepMind, 2015.9
@@ -1169,8 +1169,8 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 - UC Berkeley, 2018.1, 2018.12
 - Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
 - Soft Actor-Critic Algorithms and Applications
-- SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II，以下是将两篇文章的方法论混在一起讲，不区别，因为现在主流的框架实现都只有一个融合了小改进的SAC算法
-- SAC 也是像 DDPG 一样的 off-policy actor critic，但是SAC是类似A2C一样的 stochastic policy 而不是 DDPG 类似的 deterministic policy，SAC不是用的DDPG, A2C类似的 [policy iteration 理论](https://en.wikipedia.org/wiki/Markov_decision_process#Policy_iteration)，他用的是 soft policy iteration 理论，不同于强化学习常用的最大化累积回报优化目标，它的优化目标是 [maximum entropy objective](https://www.cs.cmu.edu/~bziebart/publications/thesis-bziebart.pdf)（式1），H是熵，最终的策略优化目标如下（式2）（其实就是 off-policy actor critic 加熵）
+- SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II
+- SAC 也是像 DDPG 一样的 off-policy actor critic，但是SAC是类似A2C一样的 stochastic policy 而不是 DDPG 类似的 deterministic policy，SAC不是用的DDPG, A2C类似的 [policy iteration 理论](https://en.wikipedia.org/wiki/Markov_decision_process#Policy_iteration)，他用的是 soft policy iteration 理论，不同于强化学习常用的最大化累积回报优化目标，它的优化目标是 [maximum entropy objective](https://www.cs.cmu.edu/~bziebart/publications/thesis-bziebart.pdf)（式1），H是熵，最终的策略优化目标如下（式2）
 
 <div align="center">
 
@@ -1179,8 +1179,8 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E [\underset{j = 1, 2}{min} {\ke
 
 </div>
 
-- SAC也用了Clipped Double-Q Learning，从上式可以看出，和TD3是一样的，SAC结合了Double DQN的思想，只有一个actor，就是没有目标网络的actor，所以选next state的action时是由行动网络的actor来选（这里有一点争议，如果是按DQN, DDPG来就应该是直接选概率最大的，[stable-baseline3](https://github.com/DLR-RM/stable-baselines3)就是这样实现的，如果是考虑TD3的Target Policy Smoothing，就应该采样，[OpenAI Spinning Up](https://github.com/openai/spinningup)是这样实现的），除以上和熵以及采样之外SAC与DDPG无区别，SAC的熵不是直接使用像PPO一样的 Shannon entropy（香农熵），而是使用香农熵的蒙特卡洛无偏估计，就是直接取概率对数的负值
-- SAC (SAC I) 在发布后存在熵loss的系数alpha难调的困境，所以又发了一篇论文 (SAC II)，这篇文章把系数alpha改为可自动调整，公式如下（省略了期望E），注意当前的熵值 -log(a | s) 是预测值，不带梯度，alpha在用于策略优化目标，critic目标函数时也不带梯度，以下公式可以理解成让当前熵逼近目标熵（人工设置，应注意目标熵是负数），大于就降低系数，小于就增大系数，大部分框架都设置了一个目标熵的默认阈值等于 - action_dim，可简单近似为标准差为1的高斯分布（SAC的policy输出和DDPG一样会经过tanh缩放至-1到1的范围，因此可以认为希望鼓励模型一直保持标准正态分布的探索模式）
+- SAC也用了Clipped Double-Q Learning，从上式可以看出，和TD3是一样的，SAC或许借鉴了Double DQN的思想，只有一个actor，就是没有目标网络的actor，所以选next state的action时是由行动网络的actor采样得到（注意SAC认为状态价值等于状态动作价值与状态熵之和的期望，这里的采样正是‘期望’的体现），除以上及熵、采样之外SAC与DDPG无区别，SAC的熵不是直接使用像PPO一样的 Shannon entropy（香农熵），而是使用香农熵的蒙特卡洛无偏估计，就是直接取动作概率对数的负值（这也正是‘期望’的体现，因为采样出动作和概率挂钩，然后取动作的概率对数负值）
+- SAC (SAC I) 在发布后存在熵loss的系数alpha难调的困境，所以又发了一篇论文 (SAC II)，这篇文章把系数alpha改为可自动调整，公式如下（省略了期望E），注意当前的熵值 -log(a | s) 不带梯度，alpha在用于策略优化目标，critic目标函数时也不带梯度，以下公式可以理解成让当前熵逼近目标熵（人工设置，应注意目标熵是负数），大于就降低系数，小于就增大系数，大部分框架都设置了一个目标熵的默认阈值等于 - action_dim，可简单近似为标准差为1的高斯分布（SAC的policy输出和DDPG一样会经过tanh缩放至-1到1的范围，因此可以认为希望鼓励模型一直保持标准正态分布的探索模式）
 
 <div align="center">
 
