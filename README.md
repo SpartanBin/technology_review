@@ -1170,7 +1170,7 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 - Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
 - Soft Actor-Critic Algorithms and Applications
 - SAC 作者是发了两篇论文的，第二篇相当于是对原算法的小改进，不过似乎会有人将第一篇的算法称为 SAC I，第二篇为 SAC II
-- SAC 也是像 DDPG 一样的 off-policy actor critic，但是SAC是类似A2C一样的 stochastic policy 而不是 DDPG 类似的 deterministic policy，SAC不是用的DDPG, A2C类似的 [policy iteration 理论](https://en.wikipedia.org/wiki/Markov_decision_process#Policy_iteration)，他用的是 soft policy iteration 理论，不同于强化学习常用的最大化累积回报优化目标，它的优化目标是 [maximum entropy objective](https://www.cs.cmu.edu/~bziebart/publications/thesis-bziebart.pdf)（式1），H是熵，最终的策略优化目标如下（式2）
+- SAC 也是像 DDPG 一样的 off-policy actor critic，但是SAC是类似A2C一样的 stochastic policy 而不是 DDPG 类似的 deterministic policy，SAC不是用的DDPG, A2C类似的 [policy iteration 理论](https://en.wikipedia.org/wiki/Markov_decision_process#Policy_iteration)，他用的是 soft policy iteration 理论，不同于强化学习常用的最大化累积回报优化目标，它的优化目标是 [maximum entropy objective](https://www.cs.cmu.edu/~bziebart/publications/thesis-bziebart.pdf)（式1），H是熵，最终的策略优化目标如下（式2），但是因为连续动作空间的动作是无限的，所以不能直接求出期望，所以不管是TD error还是策略梯度，实际实现都是使用的蒙特卡洛无偏估计
 
 <div align="center">
 
@@ -1188,4 +1188,13 @@ $$ \underset{\alpha}{\mathcal{Min}} {\kern 5pt} \alpha [ -log \pi(a | s) - \math
 
 </div>
 
-- DDPG, TD3, SAC 原本都是针对连续动作空间的环境，但SAC也有离散的版本，可以参考[论文](https://arxiv.org/abs/1910.07207)，
+- DDPG, TD3, SAC 原本都是针对连续动作空间的环境，但SAC也有离散的版本，叫作 DSAC (Discrete SAC)，可以参考[论文](https://arxiv.org/abs/1910.07207)，DSAC与SAC的区别主要是区分离散动作空间和连续动作空间的特性，因为离散动作空间是有限且可枚举的，DSAC就没有进行蒙特卡洛无偏估计，不管是估计next state的V'还是估计策略梯度（策略梯度的优化目标其实可以看成‘当前状态’的状态价值V）以及任意状态的熵H（这次就真的是是像PPO一样的 Shannon entropy），都是给出的真正的期望版本（与各动作的概率相乘）
+- 有人提出DSAC存在容易低估Q值，且熵数值变化剧烈（导致数值不稳定）的问题，特别是在高维离散动作的情况下，后又诞生 SDSAC (SD-SAC, Stable Discrete SAC)，参考[论文](https://arxiv.org/abs/2209.10081)，为了解决以上两个问题，SDSAC提出 Entropy-Penalty 和 Double Average Q-learning with Q-clip，Entropy-Penalty（式1）是在原策略梯度目标上增加惩罚项，迫使更新后的策略的熵不要太偏离原策略，Double Average Q-learning with Q-clip（式 2, 3）作者认为平均可以减轻q值低估带来的偏差，clip的灵感诞生于 PPO 的 value clipping，用以防止critic的大幅更新
+
+<div align="center">
+
+$$ \mathcal{J}_{\pi}(\phi) = E_{s_t \sim D} [E_{a_t \ sim \pi_{\phi}} [Q_{\theta}(s_t, a_t) - \alpha log \pi_{\phi}(a_t | s_t)]] - \beta \frac{1}{2} E_{s_t \ sim D} (E_{a_t \ sim \pi_{\phi_{old}}}[-log \pi_{\phi_{old}}] - E_{a_t \ sim \pi_{\phi}}[-log \pi_{\phi}])^2 $$
+$$ y = r + \gamma E_{a^{\prime} \ sim \pi}[\mathcal{avg}(Q_{\theta_1^{\prime}}(s^{\prime}, a^{\prime}), Q_{\theta_2^{\prime}}(s^{\prime}, a^{\prime}))] $$
+$$ \mathcal{L}_{\theta_i} = max((Q_{\theta_i} - y)^2, (Q_{\theta_i^{\prime}} + clip(Q_{\theta_i} - Q_{\theta_i^{\prime}}, -c, c) - y)^2) $$
+
+</div>
