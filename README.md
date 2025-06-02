@@ -1193,8 +1193,8 @@ $$ \underset{\alpha}{\mathcal{Min}} {\kern 5pt} \alpha [ -log \pi(a | s) - \math
 
 <div align="center">
 
-$$ \mathcal{J}_{\pi}(\phi) = E_{s_t \sim D} [E_{a_t \sim \pi_{\phi}} [Q_{\theta}(s_t, a_t) - \alpha log \pi_{\phi}(a_t | s_t)]] - \beta \frac{1}{2} E_{s_t \sim D} (E_{a_t \sim \pi_{\phi_{old}}}[-log \pi_{\phi_{old}}(a_t | s_t)] - E_{a_t \sim \pi_{\phi}}[-log \pi_{\phi}(a_t | s_t)])^2 $$
+$$ \underset{\phi}{\mathcal{Max}} {\kern 5pt} \mathcal{J}_{\pi}(\phi) = E_{s_t \sim D} [E_{a_t \sim \pi_{\phi}} [Q_{\theta}(s_t, a_t) - \alpha log \pi_{\phi}(a_t | s_t)]] - \beta \frac{1}{2} E_{s_t \sim D} (E_{a_t \sim \pi_{\phi_{old}}}[-log \pi_{\phi_{old}}(a_t | s_t)] - E_{a_t \sim \pi_{\phi}}[-log \pi_{\phi}(a_t | s_t)])^2 $$
 $$ y = r + \gamma E_{a^{\prime} \sim \pi}[\mathcal{avg}(Q_{\theta_1^{\prime}}(s^{\prime}, a^{\prime}), Q_{\theta_2^{\prime}}(s^{\prime}, a^{\prime}))] $$
-$$ \mathcal{L}_{\theta_i} = max((Q_{\theta_i} - y)^2, (Q_{\theta_i^{\prime}} + clip(Q_{\theta_i} - Q_{\theta_i^{\prime}}, -c, c) - y)^2) $$
+$$ \underset{\theta_i}{\mathcal{Min}} {\kern 5pt} \mathcal{L}_{\theta_i} = max((Q_{\theta_i} - y)^2, (Q_{\theta_i^{\prime}} + clip(Q_{\theta_i} - Q_{\theta_i^{\prime}}, -c, c) - y)^2) $$
 
 </div>
