@@ -1021,7 +1021,7 @@ $$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
 
 </div>
 
-- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音就是正向扩散中从标准正态分布采样的噪声I），以下式1是训练loss的原始形式，通常使用的时候我们需要把x_t写成x_0的形式，在SD 1中又加入了一个平衡权重，就得到了式2，在推理过程中，也是构造一个高斯分布（式3）从中采样，其中I采样自标准正态分布，式4是均值，式5是方差系数，但是这个采样方法也是后续主流模型不一样的点，比如DPMSolver++、Euler、Flux专用的FlowMatchEuler等
+- DDPM逆向生成则是训练扩散模型的过程，通常我们是让模型去预测每一步的噪声epsilon（loss常用mse，这里有个疑问，这个噪音就是正向扩散中从标准正态分布采样的噪声I），以下式1是训练loss的原始形式，通常使用的时候我们需要把x_t写成x_0的形式，在SD 1中又加入了一个平衡权重，就得到了式2，在推理过程中，也是构造一个高斯分布（式3）从中采样，其中I采样自标准正态分布，式4是均值，式5, 6都是方差系数，原文说这是两种选择，而且得到的结果都差不多，式5是直接使用前向过程的噪声方差这种做法非常直观：既然正向过程在第t步加的是方差为beta_t的高斯噪声，逆向去噪时也简单地用同样的方差进行采样，式6是使用后验分布的方差，这是严格地从贝叶斯意义上得到的方差，因为式5比较简单，所以实现上基本都用的式5，但是这个采样方法也是后续主流模型不一样的点，比如DPMSolver++、Euler、Flux专用的FlowMatchEuler等
 
 <div align="center">
 
@@ -1029,6 +1029,7 @@ $$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t
 $$ L = \frac{1 - \overline{\alpha}_t}{\beta_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
 $$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t I) $$
 $$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
+$$ \sigma_t^2 = \beta_t $$
 $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alpha}_t} $$
 
 </div>
