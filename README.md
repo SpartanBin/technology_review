@@ -53,6 +53,7 @@
 - [Double DQN (DeepMind, 2015.9)](#202505272217)
 - [TD3 (McGill University, 2018.2)](#202505262304)
 - [SAC (UC Berkeley, 2018.1, 2018.12)](#202505262308)
+- [DACER (Tsinghua University, 2024.5, 2025.5)](#202506032314)
 
 ## <span id="202502021731"> Transformer </span>
 - Google Brain, Google Research, 2017.6
@@ -1026,7 +1027,7 @@ $$ \overline{\alpha}_t = \prod_{s=1}^{t} (1 - \beta_s) $$
 
 $$ L = \sum_{t, \epsilon \sim N(0, I)} \big[ || \epsilon - \epsilon_{\theta}(x_t, t) ||^2 \big] $$
 $$ L = \frac{1 - \overline{\alpha}_t}{\beta_t} || \epsilon - \epsilon_{\theta}(\sqrt{\overline{\alpha}_t} x_0 + \sqrt{1 - \overline{\alpha}_t} \epsilon, t) ||^2, \epsilon \sim N(0, I) $$
-$$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t^2 I) $$
+$$ p_{\theta}(x_{t - 1} | x_t) = N(x_{t - 1}; \mu_{\theta}(x_t, t), \sigma_t I) $$
 $$ \mu_{\theta}(x_t, t) = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \overline{\alpha}_t}} \epsilon_{\theta}(x_t, t)) $$
 $$ \sigma_t^2 = \beta_t \frac{1 - \overline{\alpha}_{t - 1}}{1 - \overline{\alpha}_t} $$
 
@@ -1198,3 +1199,8 @@ $$ y = r + \gamma E_{a^{\prime} \sim \pi}[\mathcal{avg}(Q_{\theta_1^{\prime}}(s^
 $$ \underset{\theta_i}{\mathcal{Min}} {\kern 5pt} \mathcal{L}_{\theta_i} = max((Q_{\theta_i} - y)^2, (Q_{\theta_i^{\prime}} + clip(Q_{\theta_i} - Q_{\theta_i^{\prime}}, -c, c) - y)^2) $$
 
 </div>
+
+## <span id="202506032314"> DACER </span>
+- Tsinghua University, 2024.5, 2025.5
+- Diffusion Actor-Critic with Entropy Regulator
+- Enhanced DACER Algorithm with High Diffusion Efficiency
