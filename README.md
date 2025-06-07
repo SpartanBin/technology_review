@@ -53,6 +53,7 @@
 - [Double DQN (DeepMind, 2015.9)](#202505272217)
 - [TD3 (McGill University, 2018.2)](#202505262304)
 - [SAC (UC Berkeley, 2018.1, 2018.12)](#202505262308)
+- [Distributional-SAC (Tsinghua University, 2020.1, 2023.10)](#202506071230)
 - [DACER (Tsinghua University, 2024.5, 2025.5)](#202506032314)
 
 ## <span id="202502021731"> Transformer </span>
@@ -1200,6 +1201,12 @@ $$ y = r + \gamma E_{a^{\prime} \sim \pi}[\mathcal{avg}(Q_{\theta_1^{\prime}}(s^
 $$ \underset{\theta_i}{\mathcal{Min}} {\kern 5pt} \mathcal{L}_{\theta_i} = max((Q_{\theta_i} - y)^2, (Q_{\theta_i^{\prime}} + clip(Q_{\theta_i} - Q_{\theta_i^{\prime}}, -c, c) - y)^2) $$
 
 </div>
+
+## <span id="202506071230"> Distributional-SAC </span>
+- Tsinghua University, 2020.1, 2023.10
+- Distributional Soft Actor-Critic: Off-Policy Reinforcement Learning for Addressing Value Estimation Errors
+- Distributional Soft Actor-Critic with Three Refinements
+- 第一篇论文的算法又被称为 DSAC or DSACv1（和离散SAC重名），第二篇论文的算法又称作 DSAC-T or DSACv2
 
 ## <span id="202506032314"> DACER </span>
 - Tsinghua University, 2024.5, 2025.5
