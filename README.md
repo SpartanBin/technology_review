@@ -52,8 +52,16 @@
 - [DDPG (DeepMind, 2015.9)](#202505262300)
 - [Double DQN (DeepMind, 2015.9)](#202505272217)
 - [TD3 (McGill University, 2018.2)](#202505262304)
+- [soft Q-learning (UC Berkeley, 2017.2)](#202506072104)
 - [SAC (UC Berkeley, 2018.1, 2018.12)](#202505262308)
+- [C51 (DeepMind, 2017.7)](#202506072111)
+- [QR-DQN (DeepMind, 2017.10)](#202506072114)
+- [D4PG (DeepMind, 2018.4)](#202506072135)
+- [IQN (DeepMind, 2018.6)](#202506072125)
 - [Distributional-SAC (Tsinghua University, 2020.1, 2023.10)](#202506071230)
+- [Diffusion-QL (Twitter, 2022.8)](#202506072143)
+- [Decision Diffuser (MIT, 2022.11)](#202506072148)
+- [Diffusion Policy (Columbia University, 2023.3)](#202506072151)
 - [DACER (Tsinghua University, 2024.5, 2025.5)](#202506032314)
 
 ## <span id="202502021731"> Transformer </span>
@@ -1168,6 +1176,10 @@ $$ \underset{\theta}{\mathcal{Max}} {\kern 5pt} E_{s \sim D} \big[ Q_{\phi} \big
 - TD3 是对 DDPG 的改进，TD3 又叫 Twin Delayed DDPG，DDPG 存在以下问题：1.对超参数十分敏感，2.和 DQN 一样会 overestimate Q 值，3.Q值预测会有 incorrect sharp peak for some actions, the policy will quickly exploit that peak and then have brittle or incorrect behavior
 - TD3 的改进也是三点：1. Clipped Double-Q Learning, 2. “Delayed” Policy Updates, 3. Target Policy Smoothing, 1、2都是为了解决问题2（问题1没解决），3是为了解决问题3，1是用了两个critic（行动网络和目标网络都是，当然实际实现还可以加量），在预测next state q value时用两个（目标网络的）critic中相对较小的那个，训练critic两个正常分开训练，评价（行动网络的）动作价值固定用第一个critic，2是训练actor参数次数小于训练critic，比如训练2次critic才训练一次actor（当然更新目标网络参数也和训练actor的频率一致了），3是在预测next state q value时，在目标网络actor选择动作时加入了噪声，这是源于一个假设认为相似的动作应该赋予相近的 q 值，这样就起到了平滑作用
 
+## <span id="202506072104"> soft Q-learning </span>
+- UC Berkeley, 2017.2
+- Reinforcement Learning with Deep Energy-Based Policies
+
 ## <span id="202505262308"> SAC </span>
 - UC Berkeley, 2018.1, 2018.12
 - Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor
@@ -1202,11 +1214,39 @@ $$ \underset{\theta_i}{\mathcal{Min}} {\kern 5pt} \mathcal{L}_{\theta_i} = max((
 
 </div>
 
+## <span id="202506072111"> C51 </span>
+- DeepMind, 2017.7
+- A Distributional Perspective on Reinforcement Learning
+
+## <span id="202506072114"> QR-DQN </span>
+- DeepMind, 2017.10
+- Distributional Reinforcement Learning with Quantile Regression
+
+## <span id="202506072135"> D4PG </span>
+- DeepMind, 2018.4
+- Distributed Distributional Deterministic Policy Gradients
+
+## <span id="202506072125"> IQN </span>
+- DeepMind, 2018.6
+- Implicit Quantile Networks for Distributional Reinforcement Learning
+
 ## <span id="202506071230"> Distributional-SAC </span>
 - Tsinghua University, 2020.1, 2023.10
 - Distributional Soft Actor-Critic: Off-Policy Reinforcement Learning for Addressing Value Estimation Errors
 - Distributional Soft Actor-Critic with Three Refinements
 - 第一篇论文的算法又被称为 DSAC or DSACv1（和离散SAC重名），第二篇论文的算法又称作 DSAC-T or DSACv2
+
+## <span id="202506072143"> Diffusion-QL </span>
+- Twitter, 2022.8
+- Diffusion Policies as an Expressive Policy Class for Offline Reinforcement Learning
+
+## <span id="202506072148"> Decision Diffuser </span>
+- MIT, 2022.11
+- Is Conditional Generative Modeling all you need for Decision-Making?
+
+## <span id="202506072151"> Diffusion Policy </span>
+- Columbia University, 2023.3
+- Diffusion Policy: Visuomotor Policy Learning via Action Diffusion
 
 ## <span id="202506032314"> DACER </span>
 - Tsinghua University, 2024.5, 2025.5
